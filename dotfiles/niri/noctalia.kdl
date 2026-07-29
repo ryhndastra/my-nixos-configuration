@@ -1,0 +1,35 @@
+layout {
+
+    focus-ring {
+        active-gradient from="#ffb59d" to="#d6c68d" angle=45 relative-to="workspace-view" in="oklch longer hue"
+        inactive-color "#53433f99"
+        urgent-color   "#ffb4ab"
+    }
+
+    border {
+        active-gradient from="#ffb59d" to="#d6c68d" angle=45 relative-to="workspace-view" in="oklch longer hue"
+        inactive-color "#53433f99"
+        urgent-color   "#ffb4ab"
+    }
+
+    shadow {
+        color "#00000085"
+    }
+
+    tab-indicator {
+        active-gradient from="#ffb59d" to="#d6c68d" angle=45 relative-to="workspace-view" in="oklch longer hue"
+        inactive-color "#0123ff"
+        urgent-color   "#ffb4ab"
+    }
+
+    insert-hint {
+        color "#b4befe80"
+    }
+}
+
+recent-windows {
+    highlight {
+        active-color "#ffb59d"
+        urgent-color "#ffb4ab"
+    }
+}

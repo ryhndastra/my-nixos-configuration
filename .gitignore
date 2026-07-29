@@ -1,0 +1,12 @@
+# Nix build artifacts
+result
+result-*
+
+# Editor directories and files
+.idea
+*.swp
+*~
+
+# Environment files
+.direnv
+.env

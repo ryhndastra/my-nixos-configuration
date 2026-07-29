@@ -1,0 +1,99 @@
+palette = "noctalia"
+add_newline = true
+command_timeout = 1000
+
+format = """
+[ ](bold blue)[ ](bold cyan)$directory$git_branch$git_status$nodejs$python$rust$golang$package$character"""
+
+[character]
+success_symbol = "[<](bold cyan)"
+error_symbol = "[<](bold red)"
+vimcmd_symbol = "[<](bold secondary)"
+
+[directory]
+style = "bold cyan"
+read_only = " ro"
+truncation_length = 4
+truncate_to_repo = false
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+symbol = "git:"
+style = "bold secondary"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "bold red"
+format = "([$all_status$ahead_behind]($style) )"
+conflicted = "="
+ahead = "up"
+behind = "down"
+diverged = "split"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = ">"
+deleted = "x"
+
+[nodejs]
+symbol = "node:"
+style = "bold green"
+format = "[$symbol($version)]($style) "
+
+[python]
+symbol = "py:"
+style = "bold yellow"
+format = "[${symbol}${pyenv_prefix}(${version})( $virtualenv)]($style) "
+
+[rust]
+symbol = "rs:"
+style = "bold red"
+format = "[$symbol($version)]($style) "
+
+[golang]
+symbol = "go:"
+style = "bold cyan"
+format = "[$symbol($version)]($style) "
+
+[package]
+symbol = "pkg:"
+style = "bold magenta"
+format = "[$symbol$version]($style) "
+
+[palettes.noctalia]
+primary = "#ffb59d"
+secondary = "#e7bdb0"
+green = "#d6c68d"
+yellow = "#e7bdb0"
+cyan = "#d8c2bb"
+magenta = "#ffb59d"
+red = "#ffb4ab"
+text = "#f1dfda"
+subtext = "#d8c2bb"
+surface = "#1a110f"
+overlay = "#53433f"
+blue = "#d6c68d"
+white = "#f1dfda"
+black = "#53433f"
+rosewater = "#e7bdb0"
+flamingo = "#ffb4ab"
+pink = "#ffb59d"
+mauve = "#ffb59d"
+maroon = "#ffb4ab"
+peach = "#ffb59d"
+teal = "#d8c2bb"
+sky = "#d8c2bb"
+sapphire = "#d6c68d"
+lavender = "#e7bdb0"
+subtext1 = "#f1dfda"
+subtext0 = "#d8c2bb"
+overlay2 = "#a08d87"
+overlay1 = "#83716c"
+overlay0 = "#53433f"
+surface2 = "#53433f"
+surface1 = "#271d1b"
+surface0 = "#1a110f"
+base = "#1a110f"
+mantle = "#1a110f"
+crust = "#120b09"
