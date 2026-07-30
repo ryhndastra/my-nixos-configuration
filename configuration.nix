@@ -47,6 +47,12 @@
 
   services.printing.enable = false;
 
+  # Enable MariaDB (MySQL) for local development
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
+  };
+
   # Enable sound.
   services.pipewire = {
     enable = true;

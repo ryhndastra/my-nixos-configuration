@@ -201,7 +201,10 @@ in
         description = "Development environment";
         inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
         outputs = { self, nixpkgs }: let
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          pkgs = import nixpkgs {
+            system = "x86_64-linux";
+            config.allowUnfree = true;
+          };
         in {
           devShells.x86_64-linux.default = pkgs.mkShell {
             packages = with pkgs; [
@@ -285,7 +288,6 @@ in
     lazygit
     linux-wallpaperengine
     mangohud
-    mariadb
     mpv
     networkmanagerapplet
     nil
