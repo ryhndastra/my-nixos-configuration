@@ -35,7 +35,7 @@ To restore this configuration on a fresh NixOS installation:
 1. Clone this repository into `/etc/nixos/`:
    ```bash
    sudo rm -rf /etc/nixos/*
-   sudo git clone <your-repo-url> /etc/nixos/
+   sudo git clone https://github.com/ryhndastra/my-nixos-configuration.git /etc/nixos/
    ```
 2. Rebuild the system:
    ```bash
