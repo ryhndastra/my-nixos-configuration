@@ -307,6 +307,7 @@ in
     vite
     wl-clipboard
     wf-recorder
+    wpsoffice
     xwayland-satellite
     xdg-utils
     inputs.zen-browser.packages."${pkgs.stdenv.hostPlatform.system}".default
