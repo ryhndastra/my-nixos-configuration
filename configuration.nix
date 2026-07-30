@@ -79,6 +79,7 @@
 
   fonts.packages = with pkgs; [
     adwaita-fonts
+    corefonts
     dejavu_fonts
     nerd-fonts.jetbrains-mono
     noto-fonts
