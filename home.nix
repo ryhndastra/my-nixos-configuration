@@ -256,7 +256,7 @@ in
 
             echo "use flake" > .envrc
             direnv allow
-            echo "✅ Development environment for $@ is ready!"
+            echo "Development environment for $@ is ready!"
     '')
     adwaita-fonts
     alejandra
