@@ -180,7 +180,7 @@ in
     XCURSOR_SIZE = "16";
     HYPRCURSOR_THEME = "aosp-cursors";
     HYPRCURSOR_SIZE = "16";
-    FLAKE = "/etc/nixos";
+    NH_FLAKE = "/etc/nixos";
   };
 
   home.packages = with pkgs; [
