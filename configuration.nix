@@ -27,10 +27,12 @@
   boot.loader.grub.efiSupport = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 0; # Hide GRUB menu
+  boot.loader.grub.splashImage = null; # Prevent gray background flash
 
   boot.plymouth = {
     enable = true;
-    theme = "bgrt";
+    theme = "nixos-bgrt";
+    themePackages = with pkgs; [ nixos-bgrt-plymouth ];
   };
 
   # Silent Boot / Shutdown (Hide systemd text)
