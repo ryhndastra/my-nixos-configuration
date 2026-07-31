@@ -42,6 +42,8 @@
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  services.flatpak.enable = true;
+
   networking.hostName = "nixos"; # Define your hostname.
 
   networking.networkmanager.enable = true;
