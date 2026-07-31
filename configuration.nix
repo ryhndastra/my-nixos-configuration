@@ -31,8 +31,8 @@
 
   boot.plymouth = {
     enable = true;
-    theme = "nixos-bgrt";
-    themePackages = with pkgs; [ nixos-bgrt-plymouth ];
+    theme = "bgrt";
+    logo = "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
   };
 
   # Silent Boot / Shutdown (Hide systemd text)
