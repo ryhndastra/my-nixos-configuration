@@ -26,6 +26,12 @@
   boot.loader.grub.device = "nodev";
   boot.loader.grub.efiSupport = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.timeout = 0; # Hide GRUB menu
+
+  boot.plymouth = {
+    enable = true;
+    theme = "bgrt";
+  };
 
   # Silent Boot / Shutdown (Hide systemd text)
   boot.kernelParams = [
