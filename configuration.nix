@@ -26,19 +26,11 @@
   boot.loader.grub.device = "nodev";
   boot.loader.grub.efiSupport = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.timeout = 0; # Hide GRUB menu
-  boot.loader.grub.splashImage = null; # Prevent gray background flash
+  # (Plymouth and GRUB hiding removed by user request)
 
-  boot.plymouth = {
-    enable = true;
-    theme = "bgrt";
-    logo = "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
-  };
-
-  # Silent Boot / Shutdown (Hide systemd text)
+  # Silent Boot / Shutdown (Hide systemd text but keep GRUB menu)
   boot.kernelParams = [
     "quiet"
-    "splash"
     "boot.shell_on_fail"
     "loglevel=3"
     "rd.systemd.show_status=false"
