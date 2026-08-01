@@ -282,6 +282,7 @@ in
     grim
     flutter
     hyperfine
+    hyprpicker
     imv
     jq
     just
