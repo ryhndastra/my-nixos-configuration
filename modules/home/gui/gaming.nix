@@ -3,7 +3,6 @@
 {
   home.packages = with pkgs; [
     gamescope
-    hmcl
     mangohud
     protonup-qt
     # Note: Roblox is installed via Flatpak (Sober).
