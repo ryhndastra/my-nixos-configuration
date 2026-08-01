@@ -12,6 +12,7 @@
     pavucontrol
     playerctl
     slurp
+    sptlrx
     swappy
     wf-recorder
   ];
