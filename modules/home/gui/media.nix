@@ -12,7 +12,7 @@
     pavucontrol
     playerctl
     slurp
-    sptlrx
+    python3
     swappy
     wf-recorder
   ];
