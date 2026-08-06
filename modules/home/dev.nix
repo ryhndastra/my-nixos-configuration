@@ -9,6 +9,8 @@
         email = "ryhndastra@gmail.com";
       };
       init.defaultBranch = "main";
+      credential."https://github.com".helper = "!gh auth git-credential";
+      credential."https://gist.github.com".helper = "!gh auth git-credential";
     };
   };
 
