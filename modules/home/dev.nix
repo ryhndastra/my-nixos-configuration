@@ -3,6 +3,10 @@
 {
   programs.git = {
     enable = true;
+    ignores = [
+      ".direnv"
+      ".direnv/"
+    ];
     settings = {
       user = {
         name = "ryhndastra";
@@ -86,6 +90,11 @@
       EOF
 
             echo "use flake" > .envrc
+            if [ -f .gitignore ]; then
+              grep -q "^\.direnv" .gitignore || echo ".direnv/" >> .gitignore
+            else
+              echo ".direnv/" > .gitignore
+            fi
             direnv allow
             echo "Development environment for $@ is ready!"
     '')
