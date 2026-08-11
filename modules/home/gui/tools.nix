@@ -11,5 +11,8 @@
     xwayland-satellite
     wpsoffice
     obsidian
+    wl-mirror
+    wlr-randr
+    wdisplays
   ];
 }
