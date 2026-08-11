@@ -109,5 +109,6 @@
     nixd
     nixfmt
     vite
+    (pkgs.writeShellScriptBin "mirror-display" (builtins.readFile ../../dotfiles/scripts/mirror-display.sh))
   ];
 }

@@ -478,6 +478,7 @@ binds {
     Mod+C {spawn "code" ;}
     Mod+W {spawn "zen-beta" ; }
     Mod+M {spawn "spotify" ; }
+    Mod+P hotkey-overlay-title="Mirror Display (InFocus/Proyektor)" { spawn-sh "mirror-display"; }
 
     Mod+Q repeat=false { close-window; }
 
