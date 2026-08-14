@@ -44,4 +44,18 @@
 
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;
+
+  # /mnt/data (ext4 data partition)
+  # x-systemd.automount   : mount saat pertama diakses (lazy mount)
+  # x-systemd.idle-timeout: otomatis unmount setelah 5 menit idle
+  # nofail                 : boot tetap lanjut walau disk gagal mount
+  fileSystems."/mnt/data" = {
+    device = "/dev/disk/by-uuid/9ea5a392-65e2-4559-84a5-d46acaa09a50";
+    fsType = "ext4";
+    options = [
+      "nofail"
+      "x-systemd.automount"
+      "x-systemd.idle-timeout=300"
+    ];
+  };
 }
