@@ -45,6 +45,8 @@
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;
 
+  services.tailscale.enable = true;
+
   # /mnt/data (ext4 data partition)
   # x-systemd.automount   : mount saat pertama diakses (lazy mount)
   # x-systemd.idle-timeout: otomatis unmount setelah 5 menit idle
