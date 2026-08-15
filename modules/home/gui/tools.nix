@@ -15,7 +15,7 @@
     wlr-randr
     wdisplays
     (pkgs.remmina.override {
-      freerdp = pkgs.freerdp3;
+      freerdp = pkgs.freerdp;
     })
   ];
 }
