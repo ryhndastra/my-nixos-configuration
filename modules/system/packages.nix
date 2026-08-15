@@ -45,5 +45,6 @@
     usbutils
     vulkan-tools
     vscode
+    cloudflared
   ];
 }
