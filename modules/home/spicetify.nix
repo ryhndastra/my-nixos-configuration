@@ -5,7 +5,7 @@ let
 in
 {
   programs.spicetify = {
-    enable = true;
+    enable = false;
 
 
     enabledExtensions = with spicePkgs.extensions; [
