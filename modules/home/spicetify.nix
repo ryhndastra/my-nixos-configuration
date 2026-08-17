@@ -12,7 +12,7 @@ in
         owner = "Adrien5902";
         repo = "SpicetifyCat";
         rev = "main";
-        sha256 = "1s3h9wx32pnh2aqnv59vi234jsfab34qjmwwajc004r6w2cqj705";
+        sha256 = "sha256-9oqR78lf6rQtzGHHuPz/3kmLv+upJUzZ6UDEEjGexvU=";
       };
     };
     colorScheme = "Purple";
