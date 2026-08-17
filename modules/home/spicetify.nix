@@ -5,7 +5,9 @@ let
 in
 {
   programs.spicetify = {
-    enable = false;
+    enable = true;
+    theme = spicePkgs.themes.catppuccin;
+    colorScheme = "mocha";
 
 
     enabledExtensions = with spicePkgs.extensions; [
