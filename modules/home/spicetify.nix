@@ -6,15 +6,8 @@ in
 {
   programs.spicetify = {
     enable = true;
-    theme = {
-      name = "SpicetifyCat";
-      src = pkgs.fetchgit {
-        url = "https://github.com/Adrien5902/SpicetifyCat.git";
-        rev = "c0e4c14e4ad705091cf8f45637ad94dd816fa228";
-        hash = "sha256-BRYJmeAmEwCYVJxXiclYymljhog7lW2xEtBeMTpPcOg=";
-      };
-    };
-    colorScheme = "Purple";
+    theme = spicePkgs.themes.catppuccin;
+    colorScheme = "mocha";
 
     enabledExtensions = with spicePkgs.extensions; [
       adblock
