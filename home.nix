@@ -108,6 +108,13 @@ in
     force = true;
   };
 
+  # Patched Noctalia Plugins
+  xdg.dataFile."noctalia-plugins/w-engine-patched" = {
+    source = ./dotfiles/noctalia/plugins/w-engine-patched;
+    recursive = true;
+    force = true;
+  };
+
   home.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     XCURSOR_THEME = "aosp-cursors";
