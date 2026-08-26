@@ -7,13 +7,13 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/NixOS-Unstable-5277C3?style=for-the-badge&logo=nixos&logoColor=white" alt="NixOS" />
-  <img src="https://img.shields.io/badge/Compositor-Niri-9B59B6?style=for-the-badge&logo=wayland&logoColor=white" alt="Niri" />
+  <img src="https://img.shields.io/badge/NixOS-26.11%20Zokor-5277C3?style=for-the-badge&logo=nixos&logoColor=white" alt="NixOS" />
+  <img src="https://img.shields.io/badge/Kernel-Linux%207.1.8-blue?style=for-the-badge&logo=linux&logoColor=white" alt="Kernel" />
+  <img src="https://img.shields.io/badge/Compositor-Niri%2026.04-9B59B6?style=for-the-badge&logo=wayland&logoColor=white" alt="Niri" />
   <img src="https://img.shields.io/badge/Shell-Noctalia-FF6B6B?style=for-the-badge&logo=gnome&logoColor=white" alt="Noctalia" />
-  <img src="https://img.shields.io/badge/Terminal-Kitty-1E1E2E?style=for-the-badge&logo=kitty&logoColor=white" alt="Kitty" />
-  <img src="https://img.shields.io/badge/Prompt-Starship-F4D03F?style=for-the-badge&logo=starship&logoColor=black" alt="Starship" />
-  <img src="https://img.shields.io/badge/GPU-Intel%20%2B%20NVIDIA%20PRIME-76B900?style=for-the-badge&logo=nvidia&logoColor=white" alt="NVIDIA" />
-  <img src="https://img.shields.io/badge/Flakes-Enabled-blue?style=for-the-badge&logo=nixos&logoColor=white" alt="Flakes" />
+  <img src="https://img.shields.io/badge/Terminal-Kitty%200.48.2-1E1E2E?style=for-the-badge&logo=kitty&logoColor=white" alt="Kitty" />
+  <img src="https://img.shields.io/badge/GPU-Intel%20%2B%20RTX%203050-76B900?style=for-the-badge&logo=nvidia&logoColor=white" alt="NVIDIA" />
+  <img src="https://img.shields.io/badge/RAM-24%20GB%20DDR4-orange?style=for-the-badge" alt="RAM" />
 </p>
 
 </div>
@@ -24,18 +24,19 @@
 
 | Component | Specification |
 | :--- | :--- |
-| **Model** | MSI Thin 15 B12UC |
-| **CPU** | Intel® Core™ i5-12450H (12 Cores, up to 4.40 GHz) |
-| **iGPU** | Intel® UHD Graphics |
-| **dGPU** | NVIDIA GeForce RTX 3050 Mobile (PRIME Offload + Dynamic Power Management) |
-| **RAM** | 16 GB DDR4 |
-| **Storage** | NVMe SSD (NixOS Root) + 1 TB Secondary Data Drive (`/mnt/data`) |
+| **Model** | MSI Thin 15 B12UC (REV: 1.0) |
+| **CPU** | 12th Gen Intel® Core™ i5-12450H (8 Cores / 12 Threads @ up to 4.40 GHz) |
+| **iGPU** | Intel® UHD Graphics @ 1.20 GHz [Integrated] |
+| **dGPU** | NVIDIA GeForce RTX 3050 Mobile [Discrete] (PRIME Offload Mode) |
+| **RAM** | 24 GB DDR4 (23.18 GiB Usable) |
+| **Primary Storage** | 512 GB NVMe SSD (`/dev/nvme0n1p2` - Btrfs Root OS) |
+| **Secondary Storage**| 1 TB Secondary Drive (`/dev/sda4` - 800 GB Ext4 mounted at `/mnt/data`) |
 
 ---
 
 ## ✨ Key Features & Highlights
 
-- 🌌 **Smooth Wayland Compositor (Niri):** Infinite horizontal scrolling tiling window manager with dynamic workspaces and touchpad gesture navigation.
+- 🌌 **Infinite Scrollable Tiling (Niri):** Dynamic multi-column layout with fluid gestures and workspace management.
 - 🎨 **Unified Aesthetic (Noctalia Shell):** High-opacity top bar, custom widgets, system controls, and bundled custom-patched **W-Engine** plugin.
 - 🎵 **Themed Spotify (Spicetify):** Fully declarative Catppuccin theme integration with custom animations and plugins.
 - 🛠️ **Isolated Per-Project Dev Environment (`dev-init`):** Declarative helper script to instantiate zero-pollution environments for **Node.js, PHP, Go, Python, and Rust** via `direnv` + `nix-shell`.
@@ -88,9 +89,52 @@
 
 ---
 
+## ⌨️ Niri Keybindings & Hotkeys
+
+### 🚀 App Shortcuts
+| Shortcut | Action |
+| :--- | :--- |
+| **`Super + T`** | Open Terminal (`kitty`) |
+| **`Super + W`** | Launch Browser (`zen-beta`) |
+| **`Super + E`** | Open File Manager (`nautilus`) |
+| **`Super + C`** | Launch Editor (`code`) |
+| **`Super + M`** | Open Music (`spotify`) |
+| **`Super + Space`** | Open Application Launcher (`noctalia`) |
+| **`Super + S`** / **`Super + ,`** | Open Control Center / Settings (`noctalia`) |
+
+### 🪟 Window & Layout Management
+| Shortcut | Action |
+| :--- | :--- |
+| **`Super + Q`** | Close Focused Window |
+| **`Super + F`** | Maximize Column |
+| **`Super + R`** | Switch Preset Column Widths |
+| **`Super + V`** | Move Window Between Floating & Tiling |
+| **`Super + Shift + V`** | Switch Focus Between Floating & Tiling |
+| **`Super + [`** / **`Super + ]`** | Consume / Expel Window Left / Right |
+
+### 🧭 Navigation & Workspaces
+| Shortcut | Action |
+| :--- | :--- |
+| **`Super + Left`** / **`Right`** | Focus Column Left / Right |
+| **`Super + Ctrl + Left`** / **`Right`** | Move Column Left / Right |
+| **`Super + Page Up`** / **`Down`** | Switch Workspace Up / Down |
+| **`Super + Ctrl + Page Up`** / **`Down`** | Move Column to Workspace Up / Down |
+| **`Super + D`** | Open Window Overview |
+
+### 🛠️ System & Tools
+| Shortcut | Action |
+| :--- | :--- |
+| **`Super + P`** | **Mirror Display (InFocus / Proyektor)** |
+| **`PrtSc`** | Take a Screenshot |
+| **`Super + Alt + L`** | Lock Screen (`swaylock`) |
+| **`Super + Shift + /`** | Show Important Hotkeys Help |
+| **`Super + Shift + E`** | Exit Niri Session |
+
+---
+
 ## 🚀 Installation & Disaster Recovery
 
-### Option 1: Restore to a Fresh NixOS Installation
+### Restore to a Fresh NixOS Installation
 
 1. **Install NixOS** using the standard graphical installer (GNOME or Plasma).
 2. Open terminal and clone this repository to `/etc/nixos`:
@@ -111,24 +155,6 @@
    sudo nixos-rebuild switch --flake /etc/nixos#nixos
    ```
 5. **Log out** and select the **Niri** session in SDDM. Enjoy your complete desktop environment! 🎉
-
----
-
-## ⌨️ Essential Keybindings (Niri)
-
-| Shortcut | Action |
-| :--- | :--- |
-| **`Super + Return`** | Launch Kitty Terminal |
-| **`Super + B`** | Launch Zen Browser |
-| **`Super + E`** | Launch Nautilus File Manager |
-| **`Super + Space`** | Application Launcher |
-| **`Super + P`** | **Toggle HDMI InFocus / External Monitor Mirror** |
-| **`Super + Q`** | Close Active Window |
-| **`Super + F`** | Toggle Fullscreen |
-| **`Super + Left / Right`** | Focus Left / Right Column |
-| **`Super + 1..9`** | Switch to Workspace 1–9 |
-| **`Super + Shift + 1..9`** | Move Active Window to Workspace 1–9 |
-| **`Super + Shift + E`** | Power Menu / Quit Session |
 
 ---
 
