@@ -244,7 +244,7 @@ in
     configFile = {
       "kdeglobals"."KDE"."widgetStyle" = "Breeze";
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
-      "kwinrc"."Plugins"."krohnkiteEnabled" = true;
+      "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
       "kwinrc"."Windows"."CommandAllKey" = "Meta";
       "kwinrc"."Windows"."CommandAll1" = "Move";
