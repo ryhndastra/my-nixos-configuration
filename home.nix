@@ -124,21 +124,22 @@ in
       };
     };
 
-    # Floating Top Bar (Noctalia / Waybar Capsule Style)
+    # Floating Island Top Bar (Segmented Capsule Aesthetic)
     panels = [
       {
         location = "top";
-        height = 36;
+        height = 40;
         floating = true;
-        lengthMode = "custom";
         alignment = "center";
         screen = "all";
         widgets = [
+          # Left Island: NixOS Sakura Launcher + Workspace Pager
           {
             name = "org.kde.plasma.kickoff";
             config = {
               General = {
                 icon = "distributor-logo-nixos";
+                favoritesPortedToKAstats = true;
               };
             };
           }
@@ -147,10 +148,13 @@ in
             config = {
               General = {
                 showWindowIcons = true;
+                displayedText = "Number";
               };
             };
           }
           "org.kde.plasma.panelspacer"
+
+          # Center Island: Running Tasks & Dock Icons
           {
             name = "org.kde.plasma.icontasks";
             config = {
@@ -166,6 +170,8 @@ in
             };
           }
           "org.kde.plasma.panelspacer"
+
+          # Right Island: Spotify Media Controller + System Tray + Japanese/Aesthetic Clock
           {
             name = "org.kde.plasma.mediacontroller";
           }
@@ -179,6 +185,7 @@ in
                 showSeconds = "never";
                 customDateFormat = "ddd, d MMM";
                 dateFormat = "custom";
+                use24hFormat = 2;
               };
             };
           }
@@ -186,7 +193,7 @@ in
       }
     ];
 
-    # Hyprland / Niri Muscle-Memory Keybindings
+    # Keybindings (Single Super for Launcher + Niri/Hyprland Shortcuts)
     shortcuts = {
       # Applications
       "services/kitty.desktop"."_launch" = "Meta+T";
@@ -197,8 +204,10 @@ in
       "services/org.kde.spectacle.desktop"."_launch" = "Print";
 
       # Launcher & Overview
-      "krunner.desktop"."_launch" = "Meta+Space";
-      "org.kde.krunner.desktop"."_launch" = "Meta+Space";
+      "org.kde.plasma.kickoff"."_launch" = "Meta";
+      "services/org.kde.plasma.kickoff.desktop"."_launch" = "Meta";
+      "krunner.desktop"."_launch" = "Meta+D";
+      "org.kde.krunner.desktop"."_launch" = "Meta+D";
 
       # Window Controls (Niri/Hyprland Style)
       "kwin"."Window Close" = "Meta+Q";
@@ -206,7 +215,7 @@ in
       "kwin"."Window Fullscreen" = "Meta+Shift+F";
       "kwin"."Window Floating" = "Meta+V";
       "kwin"."Walk Through Windows" = "Alt+Tab";
-      "kwin"."Overview" = "Meta+D";
+      "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
       # Workspaces Navigation
@@ -228,6 +237,7 @@ in
 
     configFile = {
       "kdeglobals"."KDE"."widgetStyle" = "Breeze";
+      "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = true;
       "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
     };
