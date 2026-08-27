@@ -211,13 +211,18 @@ in
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
-      # Quick Tiling (Make Window Tiled / Half / Quarter Screen)
+      # KWin Tile Layout Editor (Super + Shift + T)
+      "kwin"."Edit Tiles" = "Meta+Shift+T";
+
+      # Quick Tiling (Native KWin Tile Snapping with 10px Gaps)
       "kwin"."Window Quick Tile Left" = "Meta+Left";
       "kwin"."Window Quick Tile Right" = "Meta+Right";
       "kwin"."Window Quick Tile Top" = "Meta+Up";
       "kwin"."Window Quick Tile Bottom" = "Meta+Down";
       "kwin"."Window Quick Tile Top Left" = "Meta+Shift+Left";
       "kwin"."Window Quick Tile Top Right" = "Meta+Shift+Right";
+      "kwin"."Window Quick Tile Bottom Left" = "Meta+Shift+Down";
+      "kwin"."Window Quick Tile Bottom Right" = "Meta+Shift+Up";
 
       # Window Resize via Keyboard
       "kwin"."Window Grow Horizontal" = "Meta+Ctrl+Right";
@@ -248,6 +253,14 @@ in
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
+
+      # KWin Plasma 6 Native Tiling & 10px Window Gaps (Matching Nadir Screenshot)
+      "kwinrc"."Tiling"."padding" = 10;
+      "kwinrc"."Tiling"."activeByDefault" = true;
+      "kwinrc"."Windows"."ElectricBorders" = 2;
+      "kwinrc"."Windows"."ElectricBorderTiling" = true;
+      "kwinrc"."Windows"."ElectricBorderMaximize" = false;
+      "kwinrc"."Windows"."CornerBarrier" = false;
 
       # Native KWin Smooth Rounded Corners Shader (14px radius + Sakura Outline Border)
       "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
