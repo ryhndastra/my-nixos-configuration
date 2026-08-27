@@ -107,8 +107,7 @@ in
           noiseStrength = 4;
         };
         translucency.enable = true;
-        wobblyWindows.enable = true;
-        shakeCursor.enable = true;
+        wobblyWindows.enable = false;
       };
       nightLight = {
         enable = true;
@@ -245,6 +244,8 @@ in
       "kdeglobals"."KDE"."widgetStyle" = "Breeze";
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
+      "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
+      "kwinrc"."Windows"."Placement" = "Centered";
       "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
       "kwinrc"."Windows"."CommandAllKey" = "Meta";
       "kwinrc"."Windows"."CommandAll1" = "Move";
