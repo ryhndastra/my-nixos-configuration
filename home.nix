@@ -132,59 +132,8 @@ in
       };
     };
 
-    # Sleek Minimal Top Floating Island Bar (No bottom dock, matches Nadir aesthetic)
-    panels = [
-      {
-        location = "top";
-        height = 32;
-        floating = true;
-        alignment = "center";
-        screen = "all";
-        widgets = [
-          # Left: NixOS Sakura Launcher
-          {
-            name = "org.kde.plasma.kickoff";
-            config = {
-              General = {
-                icon = "distributor-logo-nixos";
-                favoritesPortedToKAstats = true;
-              };
-            };
-          }
-          "org.kde.plasma.panelspacer"
-
-          # Center: Aesthetic Date & Time
-          {
-            name = "org.kde.plasma.digitalclock";
-            config = {
-              Appearance = {
-                showSeconds = "never";
-                customDateFormat = "h:mm AP • MM/dd/yy";
-                dateFormat = "custom";
-              };
-            };
-          }
-          "org.kde.plasma.panelspacer"
-
-          # Right: Pager (Workspaces) + Media Player + System Tray
-          {
-            name = "org.kde.plasma.pager";
-            config = {
-              General = {
-                showWindowIcons = true;
-                displayedText = "Number";
-              };
-            };
-          }
-          {
-            name = "org.kde.plasma.mediacontroller";
-          }
-          {
-            name = "org.kde.plasma.systemtray";
-          }
-        ];
-      }
-    ];
+    # Panels handled exclusively by Quickshell floating translucent bar
+    panels = [];
 
     # Keybindings (Single Super for Launcher + Niri/Hyprland Shortcuts + Quick Tiling)
     shortcuts = {
