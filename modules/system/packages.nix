@@ -47,5 +47,18 @@
     vulkan-tools
     vscode
     cloudflared
+
+    # KDE Plasma Utilities & Aesthetic Tools
+    catppuccin-kde
+    papirus-icon-theme
+    kdePackages.plasma-systemmonitor
+    kdePackages.spectacle
+    kdePackages.dolphin
+    kdePackages.kdegraphics-thumbnailers
+    kdePackages.ffmpegthumbs
+    kdePackages.krohnkite
+    kdePackages.kcalc
+    kdePackages.ark
+    kdePackages.plasma-browser-integration
   ];
 }

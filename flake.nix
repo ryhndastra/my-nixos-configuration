@@ -7,11 +7,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    niri.url = "github:sodiboo/niri-flake";
-    niri.inputs.nixpkgs.follows = "nixpkgs";
-    noctalia = {
-      url = "github:noctalia-dev/noctalia";
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
@@ -23,20 +22,19 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, niri, noctalia, zen-browser, spicetify-nix, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, plasma-manager, zen-browser, spicetify-nix, ... }@inputs: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs; };
       modules = [
         { nixpkgs.hostPlatform = "x86_64-linux"; }
         ./configuration.nix
-	niri.nixosModules.niri
-	home-manager.nixosModules.home-manager
-	{
+        home-manager.nixosModules.home-manager
+        {
           home-manager.useGlobalPkgs = true;
-	  home-manager.useUserPackages = true;
-	  home-manager.users.sho = import ./home.nix;
-	  home-manager.extraSpecialArgs = { inherit inputs; };
-	}
+          home-manager.useUserPackages = true;
+          home-manager.users.sho = import ./home.nix;
+          home-manager.extraSpecialArgs = { inherit inputs; };
+        }
       ];
     };
   };

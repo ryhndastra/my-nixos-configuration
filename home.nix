@@ -24,11 +24,12 @@ let
       cp -r aosp-cursors "$out/share/icons/"
     '';
   };
+  sakuraWallpaper = "${./dotfiles/wallpapers/pixel_sakura.png}";
 in
 {
   imports = [
     ./modules/home
-    inputs.noctalia.homeModules.default
+    inputs.plasma-manager.homeModules.plasma-manager
     inputs.spicetify-nix.homeManagerModules.default
   ];
 
@@ -54,6 +55,10 @@ in
       name = "aosp-cursors";
       size = 16;
     };
+    iconTheme = {
+      package = pkgs.papirus-icon-theme;
+      name = "Papirus-Dark";
+    };
   };
 
   dconf.settings = {
@@ -68,51 +73,164 @@ in
     "Xcursor.theme" = "aosp-cursors";
   };
 
-  # Niri Compositor
-  programs.niri = {
-    config = builtins.readFile ./dotfiles/niri/config.kdl;
-  };
-
-  # Noctalia Shell
-  programs.noctalia = {
+  # Declarative KDE Plasma 6 Ricing (Japanese Aesthetic + Hyprland/Niri Style)
+  programs.plasma = {
     enable = true;
-    settings = {
-      ui = {
-        panelBackgroundOpacity = 1.0;
+
+    workspace = {
+      clickItemTo = "select";
+      lookAndFeel = "org.kde.breezedark.desktop";
+      colorScheme = "CatppuccinMochaLavender";
+      cursor = {
+        theme = "aosp-cursors";
+        size = 16;
       };
-      bar = {
-        position = "top";
-      };
-      colorSchemes.predefinedScheme = "Noctalia (default)";
+      iconTheme = "Papirus-Dark";
+      wallpaper = sakuraWallpaper;
     };
-  };
 
-  xdg.configFile."noctalia/config.toml" = {
-    source = lib.mkForce ./dotfiles/noctalia/config.toml;
-    force = true;
-  };
-
-  xdg.configFile."noctalia/settings.json" = {
-    text = builtins.toJSON {
-      settingsVersion = 59;
-      bar = {
-        backgroundOpacity = 1.0;
-        capsuleOpacity = 1.0;
-        useSeparateOpacity = false;
+    # Matching SDDM Pixel Sakura Lockscreen
+    kscreenlocker = {
+      appearance = {
+        alwaysShowClock = true;
+        showMediaControls = true;
+        wallpaper = sakuraWallpaper;
       };
-      ui = {
-        panelBackgroundOpacity = 1.0;
-        translucentWidgets = false;
+      lockOnResume = true;
+      timeout = 10;
+    };
+
+    kwin = {
+      effects = {
+        blur = {
+          enable = true;
+          noiseStrength = 4;
+        };
+        translucency.enable = true;
+        wobblyWindows.enable = true;
+        shakeCursor.enable = true;
+      };
+      nightLight = {
+        enable = true;
+        mode = "times";
+        time = {
+          evening = "18:00";
+          morning = "06:00";
+        };
+      };
+      virtualDesktops = {
+        number = 5;
+        rows = 1;
       };
     };
-    force = true;
-  };
 
-  # Patched Noctalia Plugins
-  xdg.dataFile."noctalia-plugins/w-engine-patched" = {
-    source = ./dotfiles/noctalia/plugins/w-engine-patched;
-    recursive = true;
-    force = true;
+    # Floating Top Bar (Noctalia / Waybar Capsule Style)
+    panels = [
+      {
+        location = "top";
+        height = 36;
+        floating = true;
+        lengthMode = "custom";
+        alignment = "center";
+        screen = "all";
+        widgets = [
+          {
+            name = "org.kde.plasma.kickoff";
+            config = {
+              General = {
+                icon = "distributor-logo-nixos";
+              };
+            };
+          }
+          {
+            name = "org.kde.plasma.pager";
+            config = {
+              General = {
+                showWindowIcons = true;
+              };
+            };
+          }
+          "org.kde.plasma.panelspacer"
+          {
+            name = "org.kde.plasma.icontasks";
+            config = {
+              General = {
+                launchers = [
+                  "applications:kitty.desktop"
+                  "applications:zen-beta.desktop"
+                  "applications:code.desktop"
+                  "applications:spotify.desktop"
+                  "applications:org.gnome.Nautilus.desktop"
+                ];
+              };
+            };
+          }
+          "org.kde.plasma.panelspacer"
+          {
+            name = "org.kde.plasma.mediacontroller";
+          }
+          {
+            name = "org.kde.plasma.systemtray";
+          }
+          {
+            name = "org.kde.plasma.digitalclock";
+            config = {
+              Appearance = {
+                showSeconds = "never";
+                customDateFormat = "ddd, d MMM";
+                dateFormat = "custom";
+              };
+            };
+          }
+        ];
+      }
+    ];
+
+    # Hyprland / Niri Muscle-Memory Keybindings
+    shortcuts = {
+      # Applications
+      "services/kitty.desktop"."_launch" = "Meta+T";
+      "services/zen-beta.desktop"."_launch" = "Meta+W";
+      "services/org.gnome.Nautilus.desktop"."_launch" = "Meta+E";
+      "services/code.desktop"."_launch" = "Meta+C";
+      "services/spotify.desktop"."_launch" = "Meta+M";
+      "services/org.kde.spectacle.desktop"."_launch" = "Print";
+
+      # Launcher & Overview
+      "krunner.desktop"."_launch" = "Meta+Space";
+      "org.kde.krunner.desktop"."_launch" = "Meta+Space";
+
+      # Window Controls (Niri/Hyprland Style)
+      "kwin"."Window Close" = "Meta+Q";
+      "kwin"."Window Maximize" = "Meta+F";
+      "kwin"."Window Fullscreen" = "Meta+Shift+F";
+      "kwin"."Window Floating" = "Meta+V";
+      "kwin"."Walk Through Windows" = "Alt+Tab";
+      "kwin"."Overview" = "Meta+D";
+      "kwin"."Show Desktop" = "Meta+Shift+D";
+
+      # Workspaces Navigation
+      "kwin"."Switch to Desktop 1" = "Meta+1";
+      "kwin"."Switch to Desktop 2" = "Meta+2";
+      "kwin"."Switch to Desktop 3" = "Meta+3";
+      "kwin"."Switch to Desktop 4" = "Meta+4";
+      "kwin"."Switch to Desktop 5" = "Meta+5";
+
+      "kwin"."Window to Desktop 1" = "Meta+Shift+!";
+      "kwin"."Window to Desktop 2" = "Meta+Shift+@";
+      "kwin"."Window to Desktop 3" = "Meta+Shift+#";
+      "kwin"."Window to Desktop 4" = "Meta+Shift+$";
+      "kwin"."Window to Desktop 5" = "Meta+Shift+%";
+
+      # Lock screen (matching Niri Meta+Alt+L)
+      "ksmserver"."Lock Session" = "Meta+Alt+L";
+    };
+
+    configFile = {
+      "kdeglobals"."KDE"."widgetStyle" = "Breeze";
+      "kwinrc"."Plugins"."krohnkiteEnabled" = true;
+      "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
+    };
   };
 
   home.sessionVariables = {

@@ -31,6 +31,10 @@
     gamescopeSession.enable = true;
   };
 
+  # Desktop Manager: KDE Plasma 6 (Wayland)
+  services.desktopManager.plasma6.enable = true;
+  services.displayManager.defaultSession = "plasma";
+
   # Greeter / Display Manager (SDDM)
   services.displayManager.sddm = {
     enable = true;
