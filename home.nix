@@ -132,16 +132,17 @@ in
       };
     };
 
-    # Floating Island Top Bar (Segmented Capsule Aesthetic)
+    # Two-Panel Aesthetic Layout (Top Minimal Status Bar + Bottom Floating App Dock)
     panels = [
+      # 1. Top Floating Status Island
       {
         location = "top";
-        height = 40;
+        height = 34;
         floating = true;
         alignment = "center";
         screen = "all";
         widgets = [
-          # Left Island: NixOS Sakura Launcher + Workspace Pager
+          # Left: NixOS Sakura Launcher
           {
             name = "org.kde.plasma.kickoff";
             config = {
@@ -151,49 +152,51 @@ in
               };
             };
           }
+          "org.kde.plasma.panelspacer"
+
+          # Center: Aesthetic Date & Time
           {
-            name = "org.kde.plasma.pager";
+            name = "org.kde.plasma.digitalclock";
             config = {
-              General = {
-                showWindowIcons = true;
-                displayedText = "Number";
+              Appearance = {
+                showSeconds = "never";
+                customDateFormat = "h:mm AP • MM/dd/yy";
+                dateFormat = "custom";
               };
             };
           }
           "org.kde.plasma.panelspacer"
 
-          # Center Island: Running Tasks & Dock Icons
-          {
-            name = "org.kde.plasma.icontasks";
-            config = {
-              General = {
-                launchers = [
-                  "applications:kitty.desktop"
-                  "applications:zen-beta.desktop"
-                  "applications:code.desktop"
-                  "applications:spotify.desktop"
-                  "applications:org.gnome.Nautilus.desktop"
-                ];
-              };
-            };
-          }
-          "org.kde.plasma.panelspacer"
-
-          # Right Island: Spotify Media Controller + System Tray + Japanese/Aesthetic Clock
+          # Right: Media Controller + System Tray
           {
             name = "org.kde.plasma.mediacontroller";
           }
           {
             name = "org.kde.plasma.systemtray";
           }
+        ];
+      }
+
+      # 2. Bottom Floating App Dock (Capsule Pill Dock)
+      {
+        location = "bottom";
+        height = 54;
+        floating = true;
+        lengthMode = "custom";
+        alignment = "center";
+        screen = "all";
+        widgets = [
           {
-            name = "org.kde.plasma.digitalclock";
+            name = "org.kde.plasma.icontasks";
             config = {
-              Appearance = {
-                showSeconds = "never";
-                customDateFormat = "MM月dd日 (ddd)";
-                dateFormat = "custom";
-                use24hFormat = 2;
+              General = {
+                launchers = [
+                  "applications:zen-beta.desktop"
+                  "applications:kitty.desktop"
+                  "applications:org.gnome.Nautilus.desktop"
+                  "applications:code.desktop"
+                  "applications:spotify.desktop"
+                ];
               };
             };
           }
@@ -273,11 +276,13 @@ in
       "kwinrc"."Effect-shapecorners"."Shadow" = true;
       "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
 
-      # Sleek Modern Window Decorations (Clean minimal borders)
+      # Sleek Modern Window Decorations (Mac Traffic Light buttons)
+      "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";
+      "kwinrc"."org.kde.kdecoration2"."theme" = "__aurorae__svg__CatppuccinFrappe-Modern";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
       "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
       "kwinrc"."org.kde.kdecoration2"."BorderSizeAuto" = false;
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
 
       # Mouse on Focus (Focus Follows Mouse)
       "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
@@ -287,22 +292,24 @@ in
 
       # Window Placement & Dimensions (Moderate Centered Floating Window by default)
       "kwinrc"."Windows"."Placement" = "Centered";
-      "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
+      "kwinrc"."Windows"."BorderlessMaximizedWindows" = false;
       "kwinrc"."Windows"."CommandAllKey" = "Meta";
       "kwinrc"."Windows"."CommandAll1" = "Move";
       "kwinrc"."Windows"."CommandAll2" = "Resize";
       "kwinrc"."Windows"."CommandAll3" = "Maximize";
 
-      # Default Moderate Initial Window Size Rule (1060x660 centered, not auto-maximized)
-      "kwinrulesrc"."1"."Description" = "Default Centered Moderate Window Size";
+      # Explicit KWin Window Rule: ALWAYS spawn normal windows centered, floating, and NEVER maximized
+      "kwinrulesrc"."1"."Description" = "Default Floating Windows (Never Auto-Maximize)";
       "kwinrulesrc"."1"."types" = "1";
       "kwinrulesrc"."1"."wmclassmatch" = 0;
-      "kwinrulesrc"."1"."size" = "1060,660";
-      "kwinrulesrc"."1"."sizerule" = 4; # Apply initially
+      "kwinrulesrc"."1"."size" = "1040,650";
+      "kwinrulesrc"."1"."sizerule" = 3; # 3 = Apply initially
+      "kwinrulesrc"."1"."position" = "center";
+      "kwinrulesrc"."1"."positionrule" = 3; # 3 = Apply initially
       "kwinrulesrc"."1"."maximizehoriz" = false;
-      "kwinrulesrc"."1"."maximizehorizrule" = 4;
+      "kwinrulesrc"."1"."maximizehorizrule" = 3; # 3 = Apply initially
       "kwinrulesrc"."1"."maximizevert" = false;
-      "kwinrulesrc"."1"."maximizevertrule" = 4;
+      "kwinrulesrc"."1"."maximizevertrule" = 3; # 3 = Apply initially
       "kwinrulesrc"."General"."count" = 1;
       "kwinrulesrc"."General"."rules" = "1";
     };
