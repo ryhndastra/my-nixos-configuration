@@ -262,6 +262,14 @@ in
       "kwinrc"."Windows"."ElectricBorderMaximize" = false;
       "kwinrc"."Windows"."CornerBarrier" = false;
 
+      # KWin GPU Frosted Glass Blur & Window Translucency
+      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = true;
+      "kwinrc"."Effect-translucency"."ActiveWindow" = 92;
+      "kwinrc"."Effect-translucency"."InactiveWindow" = 82;
+      "kwinrc"."Effect-translucency"."Dialogs" = 90;
+      "kwinrc"."Effect-translucency"."Menus" = 85;
+      "kwinrc"."Effect-translucency"."MoveResize" = 80;
+
       # Native KWin Smooth Rounded Corners Shader (14px radius + Sakura Outline Border)
       "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
       "kwinrc"."Effect-shapecorners"."RoundCorners" = true;
