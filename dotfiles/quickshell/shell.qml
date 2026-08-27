@@ -522,6 +522,27 @@ ShellRoot {
                                 onClicked: Process.exec(["loginctl", "lock-session"])
                             }
                         }
+
+                        // Logout / Power Menu
+                        Rectangle {
+                            width: 20
+                            height: 20
+                            radius: 5
+                            color: pMouse.containsMouse ? "#60f38ba8" : "#20f38ba8"
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰐥"
+                                font.pixelSize: 12
+                                color: "#f38ba8"
+                            }
+                            MouseArea {
+                                id: pMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["qdbus", "org.kde.Shutdown", "/Shutdown", "logoutAndPrompt"])
+                            }
+                        }
                     }
                 }
             }
