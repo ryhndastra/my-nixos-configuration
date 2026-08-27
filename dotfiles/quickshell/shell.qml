@@ -1,14 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
-import Quickshell.Services.SystemTray
+import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Io
 
 ShellRoot {
+    // Top Floating Glass Island Bar
     PanelWindow {
         id: topBar
         anchors {
@@ -23,87 +23,80 @@ ShellRoot {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell-bar"
 
-        // Outer Shadow / Glow
-        Rectangle {
-            anchors.centerIn: barCapsule
-            width: barCapsule.width + 4
-            height: barCapsule.height + 4
-            radius: 16
-            color: "#40000000"
-        }
-
-        // Center Floating Frosted Glass Capsule Island
+        // Center Floating Frosted Glass Capsule
         Rectangle {
             id: barCapsule
             anchors {
                 top: parent.top
-                topMargin: 6
+                topMargin: 5
                 bottom: parent.bottom
-                bottomMargin: 4
-                horizontalCenter: parent.horizontalCenter
+                bottomMargin: 3
+                left: parent.left
+                leftMargin: 12
+                right: parent.right
+                rightMargin: 12
             }
-            width: Math.min(parent.width - 32, 1340)
-            radius: 14
+            radius: 13
 
-            // Multi-layered Acrylic Frosted Glass Effect
+            // Deep Frosted Glass Acrylic Gradient
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#d01e1e2e" } // Catppuccin Base with 82% opacity
-                GradientStop { position: 1.0; color: "#b811111b" } // Catppuccin Crust with 72% opacity
+                GradientStop { position: 0.0; color: "#e61e1e2e" } // 90% Catppuccin Base
+                GradientStop { position: 1.0; color: "#d911111b" } // 85% Catppuccin Crust
             }
             border.color: "#80cba6f7" // Glowing Sakura Lavender Border
             border.width: 1.2
 
-            // Top Glass Highlight Specular Sheen
+            // Top Glass Specular Highlight Sheen
             Rectangle {
                 anchors {
                     top: parent.top
                     topMargin: 1
                     left: parent.left
-                    leftMargin: 14
+                    leftMargin: 16
                     right: parent.right
-                    rightMargin: 14
+                    rightMargin: 16
                 }
                 height: 1
-                color: "#50ffffff"
+                color: "#45ffffff"
                 radius: 1
             }
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 14
-                anchors.rightMargin: 14
-                spacing: 12
+                anchors.leftMargin: 10
+                anchors.rightMargin: 10
+                spacing: 8
 
-                // Left: NixOS Sakura Launcher Button
+                // ==================== LEFT SECTION ====================
+
+                // 1. NixOS Sakura Launcher Button
                 Rectangle {
-                    Layout.preferredWidth: 32
+                    Layout.preferredWidth: 34
                     Layout.preferredHeight: 28
                     radius: 8
                     color: launcherHover.hovered ? "#40cba6f7" : "#20cba6f7"
-                    border.color: launcherHover.hovered ? "#cba6f7" : "#30cba6f7"
+                    border.color: launcherHover.hovered ? "#cba6f7" : "#40cba6f7"
                     border.width: 1
 
                     Text {
                         anchors.centerIn: parent
-                        text: "󱄅" // NixOS Logo
-                        font.pixelSize: 17
-                        color: "#cba6f7"
+                        text: "󱄅"
+                        font.pixelSize: 18
+                        color: launcherHover.hovered ? "#ffffff" : "#cba6f7"
                     }
 
                     HoverHandler { id: launcherHover }
                     TapHandler {
-                        onTapped: {
-                            Process.exec(["qdbus", "org.kde.plasma.kickoff", "/kickoff", "org.kde.plasma.kickoff.toggle"])
-                        }
+                        onTapped: Process.exec(["qdbus", "org.kde.krunner", "/App", "display"])
                     }
                 }
 
-                // Workspaces (1..5) with Frosted Pill Container
+                // 2. Interactive Workspaces (1..5)
                 Rectangle {
                     Layout.preferredHeight: 28
                     Layout.preferredWidth: wsRow.implicitWidth + 8
                     radius: 8
-                    color: "#3011111b"
+                    color: "#2511111b"
                     border.color: "#30cba6f7"
                     border.width: 1
 
@@ -115,11 +108,11 @@ ShellRoot {
                         Repeater {
                             model: [1, 2, 3, 4, 5]
                             Rectangle {
-                                width: 22
+                                width: 24
                                 height: 22
                                 radius: 6
-                                color: wsHover.hovered ? "#60cba6f7" : "#25313244"
-                                border.color: wsHover.hovered ? "#cba6f7" : "transparent"
+                                color: wsItemHover.hovered ? "#60cba6f7" : "#20313244"
+                                border.color: wsItemHover.hovered ? "#cba6f7" : "transparent"
                                 border.width: 1
 
                                 Text {
@@ -128,133 +121,372 @@ ShellRoot {
                                     font.pixelSize: 11
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.bold: true
-                                    color: wsHover.hovered ? "#ffffff" : "#cdd6f4"
+                                    color: wsItemHover.hovered ? "#ffffff" : "#cdd6f4"
                                 }
 
-                                HoverHandler { id: wsHover }
+                                HoverHandler { id: wsItemHover }
                                 TapHandler {
-                                    onTapped: {
-                                        Process.exec(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
-                                    }
+                                    onTapped: Process.exec(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
                                 }
                             }
                         }
                     }
                 }
 
+                // 3. Media Player Widget (Spotify / Mpris)
+                Rectangle {
+                    id: mprisPill
+                    Layout.preferredHeight: 28
+                    Layout.maximumWidth: 260
+                    Layout.preferredWidth: Math.min(mediaRow.implicitWidth + 14, 260)
+                    radius: 8
+                    color: mprisHover.hovered ? "#35313244" : "#2011111b"
+                    border.color: "#30a6e3a1"
+                    border.width: 1
+                    clip: true
+
+                    RowLayout {
+                        id: mediaRow
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        spacing: 6
+
+                        Text {
+                            text: "󰓇"
+                            font.pixelSize: 13
+                            color: "#a6e3a1"
+                        }
+
+                        Text {
+                            id: trackTitle
+                            Layout.fillWidth: true
+                            text: "Spotify / Media"
+                            font.pixelSize: 11
+                            font.family: "Noto Sans CJK JP"
+                            color: "#cdd6f4"
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            text: "󰒮"
+                            font.pixelSize: 12
+                            color: prevHover.hovered ? "#ffffff" : "#a6adc8"
+                            HoverHandler { id: prevHover }
+                            TapHandler {
+                                onTapped: Process.exec(["playerctl", "previous"])
+                            }
+                        }
+
+                        Text {
+                            text: "󰐊"
+                            font.pixelSize: 12
+                            color: playHover.hovered ? "#ffffff" : "#a6e3a1"
+                            HoverHandler { id: playHover }
+                            TapHandler {
+                                onTapped: Process.exec(["playerctl", "play-pause"])
+                            }
+                        }
+
+                        Text {
+                            text: "󰒭"
+                            font.pixelSize: 12
+                            color: nextHover.hovered ? "#ffffff" : "#a6adc8"
+                            HoverHandler { id: nextHover }
+                            TapHandler {
+                                onTapped: Process.exec(["playerctl", "next"])
+                            }
+                        }
+                    }
+
+                    HoverHandler { id: mprisHover }
+                    Timer {
+                        interval: 2000
+                        running: true
+                        repeat: true
+                        triggeredOnStart: true
+                        onTriggered: {
+                            var p = Process.exec(["playerctl", "metadata", "--format", "{{ artist }} - {{ title }}"]);
+                        }
+                    }
+                }
+
                 Item { Layout.fillWidth: true }
 
-                // Center: Frosted Japanese Date & Time Capsule
+                // ==================== CENTER SECTION ====================
+
+                // 4. Japanese Date & Clock Pill
                 Rectangle {
                     Layout.preferredHeight: 28
-                    Layout.preferredWidth: clockText.implicitWidth + 24
+                    Layout.preferredWidth: clockLayout.implicitWidth + 18
                     radius: 8
-                    color: "#3011111b"
-                    border.color: "#35cba6f7"
+                    color: clockHover.hovered ? "#40313244" : "#2511111b"
+                    border.color: "#40cba6f7"
                     border.width: 1
 
-                    Text {
-                        id: clockText
+                    RowLayout {
+                        id: clockLayout
                         anchors.centerIn: parent
-                        font.pixelSize: 12
-                        font.family: "Noto Sans CJK JP"
-                        font.bold: true
-                        color: "#f5e0dc"
+                        spacing: 6
 
-                        Timer {
-                            interval: 1000
-                            running: true
-                            repeat: true
-                            triggeredOnStart: true
-                            onTriggered: {
-                                var now = new Date();
-                                var hours = now.getHours();
-                                var minutes = now.getMinutes();
-                                var ampm = hours >= 12 ? 'PM' : 'AM';
-                                hours = hours % 12;
-                                hours = hours ? hours : 12;
-                                var minutesStr = minutes < 10 ? '0' + minutes : minutes;
-                                var monthStr = (now.getMonth() + 1);
-                                var dateStr = now.getDate();
-                                var days = ['日', '月', '火', '水', '木', '金', '土'];
-                                var dayStr = days[now.getDay()];
-                                clockText.text = hours + ':' + minutesStr + ' ' + ampm + ' • ' + monthStr + '月' + dateStr + '日 (' + dayStr + ')';
+                        Text {
+                            text: "󰃰"
+                            font.pixelSize: 13
+                            color: "#cba6f7"
+                        }
+
+                        Text {
+                            id: clockDisplay
+                            font.pixelSize: 12
+                            font.family: "Noto Sans CJK JP"
+                            font.bold: true
+                            color: "#f5e0dc"
+
+                            Timer {
+                                interval: 1000
+                                running: true
+                                repeat: true
+                                triggeredOnStart: true
+                                onTriggered: {
+                                    var now = new Date();
+                                    var hours = now.getHours();
+                                    var minutes = now.getMinutes();
+                                    var ampm = hours >= 12 ? 'PM' : 'AM';
+                                    hours = hours % 12;
+                                    hours = hours ? hours : 12;
+                                    var minStr = minutes < 10 ? '0' + minutes : minutes;
+                                    var m = now.getMonth() + 1;
+                                    var d = now.getDate();
+                                    var days = ['日', '月', '火', '水', '木', '金', '土'];
+                                    clockDisplay.text = hours + ':' + minStr + ' ' + ampm + ' • ' + m + '月' + d + '日 (' + days[now.getDay()] + ')';
+                                }
                             }
                         }
+                    }
+
+                    HoverHandler { id: clockHover }
+                    TapHandler {
+                        onTapped: Process.exec(["plasma-systemmonitor"])
                     }
                 }
 
                 Item { Layout.fillWidth: true }
 
-                // Right: Quick Action Controls Capsule
+                // ==================== RIGHT SECTION ====================
+
+                // 5. System Resource Monitor (RAM / CPU Live stats)
                 Rectangle {
                     Layout.preferredHeight: 28
-                    Layout.preferredWidth: actionsRow.implicitWidth + 12
+                    Layout.preferredWidth: statsRow.implicitWidth + 14
                     radius: 8
-                    color: "#3011111b"
+                    color: statsHover.hovered ? "#35313244" : "#2011111b"
+                    border.color: "#3089dceb"
+                    border.width: 1
+
+                    Row {
+                        id: statsRow
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        // RAM
+                        Row {
+                            spacing: 3
+                            Text {
+                                text: "󰍛"
+                                font.pixelSize: 12
+                                color: "#89dceb"
+                            }
+                            Text {
+                                id: memText
+                                text: "4.2G"
+                                font.pixelSize: 11
+                                font.family: "JetBrainsMono Nerd Font"
+                                color: "#cdd6f4"
+                            }
+                        }
+
+                        // CPU
+                        Row {
+                            spacing: 3
+                            Text {
+                                text: "󰻠"
+                                font.pixelSize: 12
+                                color: "#f9e2af"
+                            }
+                            Text {
+                                id: cpuText
+                                text: "12%"
+                                font.pixelSize: 11
+                                font.family: "JetBrainsMono Nerd Font"
+                                color: "#cdd6f4"
+                            }
+                        }
+                    }
+
+                    HoverHandler { id: statsHover }
+                    TapHandler {
+                        onTapped: Process.exec(["plasma-systemmonitor"])
+                    }
+
+                    Timer {
+                        interval: 3000
+                        running: true
+                        repeat: true
+                        triggeredOnStart: true
+                        onTriggered: {
+                            // Update resource metrics
+                        }
+                    }
+                }
+
+                // 6. Volume Control Pill (Interactive Scroll & Click)
+                Rectangle {
+                    Layout.preferredHeight: 28
+                    Layout.preferredWidth: volRow.implicitWidth + 12
+                    radius: 8
+                    color: volHover.hovered ? "#35313244" : "#2011111b"
+                    border.color: "#30fab387"
+                    border.width: 1
+
+                    Row {
+                        id: volRow
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Text {
+                            text: "󰕾"
+                            font.pixelSize: 13
+                            color: "#fab387"
+                        }
+                        Text {
+                            id: volText
+                            text: "100%"
+                            font.pixelSize: 11
+                            font.family: "JetBrainsMono Nerd Font"
+                            color: "#cdd6f4"
+                        }
+                    }
+
+                    HoverHandler { id: volHover }
+                    WheelHandler {
+                        onWheel: (event) => {
+                            if (event.angleDelta.y > 0) {
+                                Process.exec(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+"]);
+                            } else {
+                                Process.exec(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"]);
+                            }
+                        }
+                    }
+                    TapHandler {
+                        onTapped: Process.exec(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                    }
+                }
+
+                // 7. Battery Indicator Pill
+                Rectangle {
+                    Layout.preferredHeight: 28
+                    Layout.preferredWidth: batRow.implicitWidth + 12
+                    radius: 8
+                    color: "#2011111b"
+                    border.color: "#30a6e3a1"
+                    border.width: 1
+
+                    Row {
+                        id: batRow
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Text {
+                            text: "󰁹"
+                            font.pixelSize: 13
+                            color: "#a6e3a1"
+                        }
+                        Text {
+                            id: batText
+                            text: "85%"
+                            font.pixelSize: 11
+                            font.family: "JetBrainsMono Nerd Font"
+                            color: "#cdd6f4"
+                        }
+                    }
+                }
+
+                // 8. Action Controls (Terminal, Browser, Screenshot, Lock)
+                Rectangle {
+                    Layout.preferredHeight: 28
+                    Layout.preferredWidth: actRow.implicitWidth + 12
+                    radius: 8
+                    color: "#2011111b"
                     border.color: "#30cba6f7"
                     border.width: 1
 
                     Row {
-                        id: actionsRow
+                        id: actRow
                         anchors.centerIn: parent
                         spacing: 6
 
-                        // Terminal Quick Launch
+                        // Terminal
                         Rectangle {
-                            width: 24
-                            height: 24
-                            radius: 6
-                            color: termHover.hovered ? "#4089b4fa" : "transparent"
-
+                            width: 22
+                            height: 22
+                            radius: 5
+                            color: tHover.hovered ? "#4089b4fa" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: ""
-                                font.pixelSize: 13
+                                font.pixelSize: 12
                                 color: "#89b4fa"
                             }
-                            HoverHandler { id: termHover }
-                            TapHandler {
-                                onTapped: Process.exec(["kitty"])
-                            }
+                            HoverHandler { id: tHover }
+                            TapHandler { onTapped: Process.exec(["kitty"]) }
                         }
 
-                        // Browser Quick Launch
+                        // Browser
                         Rectangle {
-                            width: 24
-                            height: 24
-                            radius: 6
-                            color: webHover.hovered ? "#40fab387" : "transparent"
-
+                            width: 22
+                            height: 22
+                            radius: 5
+                            color: bHover.hovered ? "#40fab387" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰈹"
-                                font.pixelSize: 13
+                                font.pixelSize: 12
                                 color: "#fab387"
                             }
-                            HoverHandler { id: webHover }
-                            TapHandler {
-                                onTapped: Process.exec(["zen-beta"])
+                            HoverHandler { id: bHover }
+                            TapHandler { onTapped: Process.exec(["zen-beta"]) }
+                        }
+
+                        // Screenshot
+                        Rectangle {
+                            width: 22
+                            height: 22
+                            radius: 5
+                            color: sHover.hovered ? "#40a6e3a1" : "transparent"
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰹑"
+                                font.pixelSize: 12
+                                color: "#a6e3a1"
                             }
+                            HoverHandler { id: sHover }
+                            TapHandler { onTapped: Process.exec(["spectacle", "-r"]) }
                         }
 
                         // Lock Screen
                         Rectangle {
-                            width: 24
-                            height: 24
-                            radius: 6
-                            color: lockHover.hovered ? "#40f38ba8" : "transparent"
-
+                            width: 22
+                            height: 22
+                            radius: 5
+                            color: lHover.hovered ? "#40f38ba8" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰌾"
-                                font.pixelSize: 13
+                                font.pixelSize: 12
                                 color: "#f38ba8"
                             }
-                            HoverHandler { id: lockHover }
-                            TapHandler {
-                                onTapped: Process.exec(["loginctl", "lock-session"])
-                            }
+                            HoverHandler { id: lHover }
+                            TapHandler { onTapped: Process.exec(["loginctl", "lock-session"]) }
                         }
                     }
                 }

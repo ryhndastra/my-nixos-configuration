@@ -258,8 +258,8 @@ in
       "kwinrc"."Windows"."CommandAll2" = "Resize";
       "kwinrc"."Windows"."CommandAll3" = "Maximize";
 
-      # Explicit KWin Window Rule: ALWAYS spawn normal windows centered, floating, and forced translucent
-      "kwinrulesrc"."1"."Description" = "Default Floating & Translucent Windows";
+      # Explicit KWin Window Rule: ALWAYS spawn normal windows centered & floating with ideal size
+      "kwinrulesrc"."1"."Description" = "Default Floating Windows";
       "kwinrulesrc"."1"."types" = "1";
       "kwinrulesrc"."1"."wmclassmatch" = 0;
       "kwinrulesrc"."1"."size" = "1040,650";
@@ -270,10 +270,6 @@ in
       "kwinrulesrc"."1"."maximizehorizrule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."1"."maximizevert" = false;
       "kwinrulesrc"."1"."maximizevertrule" = 3; # 3 = Apply on initial spawn
-      "kwinrulesrc"."1"."opacityactive" = 92;
-      "kwinrulesrc"."1"."opacityactiverule" = 2; # 2 = Force 92% active opacity
-      "kwinrulesrc"."1"."opacityinactive" = 82;
-      "kwinrulesrc"."1"."opacityinactiverule" = 2; # 2 = Force 82% inactive opacity
       "kwinrulesrc"."General"."count" = 1;
       "kwinrulesrc"."General"."rules" = "1";
     };
