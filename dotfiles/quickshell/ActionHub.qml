@@ -28,7 +28,7 @@ Item {
             Repeater {
                 model: [
                     // Kitty uses the cat icon (nerd font)
-                    { icon: "", color: "#89b4fa",  sig: "kitty"   },
+                    { icon: "󰄛", color: "#89b4fa",  sig: "kitty"   },
                     { icon: "󰈹", color: "#fab387", sig: "browser"  },
                     { icon: "󰹑", color: "#a6e3a1", sig: "shot"     },
                     { icon: "󰌾", color: "#f38ba8", sig: "lock"     },
