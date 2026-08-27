@@ -59,7 +59,7 @@
 │
 ├── modules/
 │   ├── system/                # System-level configurations (Root / NixOS)
-│   │   ├── boot.nix           # Systemd-boot & latest Linux Kernel
+│   │   ├── boot.nix           # GRUB UEFI Bootloader & latest Linux Kernel
 │   │   ├── hardware.nix       # Intel + NVIDIA PRIME Offload drivers & OpenGL
 │   │   ├── networking.nix     # NetworkManager, firewall & DNS
 │   │   ├── packages.nix       # Core CLI utilities, fonts & desktop tools
@@ -154,7 +154,30 @@
    # Or using standard nixos-rebuild:
    sudo nixos-rebuild switch --flake /etc/nixos#nixos
    ```
-5. **Log out** and select the **Niri** session in SDDM. Enjoy your complete desktop environment! 🎉
+5. **Clean Bootloader Migration (Fix UEFI Boot Priority):**
+   *(Crucial step: prevent motherboard BIOS from booting installer's old systemd-boot fallback)*
+   ```bash
+   # Hapus sisa konfigurasi systemd-boot bawaan installer
+   sudo rm -rf /boot/loader /boot/EFI/systemd
+
+   # Timpa file fallback BOOTX64.EFI dengan GRUB
+   sudo cp -f /boot/EFI/NixOS-boot/grubx64.efi /boot/EFI/BOOT/BOOTX64.EFI
+
+   # Set GRUB (NixOS-boot) sebagai prioritas boot #1
+   sudo efibootmgr -o 0002,0001,0003,0004,0005
+   ```
+6. **Restart Laptop:**
+   ```bash
+   reboot
+   ```
+7. **Post-Install Setup:**
+   * **Antigravity / App Credentials:** Login sekali di browser setelah masuk ke desktop. Sesi login otomatis tersimpan permanen di GNOME Keyring (di-unlock otomatis oleh PAM SDDM).
+   * **Noctalia Patched Plugins:** Daftarkan direktori plugin lokal ke Noctalia:
+     ```bash
+     noctalia msg plugins source add local path ~/.local/share/noctalia-plugins
+     noctalia msg plugins enable sho/w-engine-patched
+     ```
+   * **Storage (`/mnt/data`):** Partisi sekunder menggunakan systemd automount (lazy mount). Partisi akan otomatis ter-mount begitu folder `/mnt/data` diakses.
 
 ---
 
