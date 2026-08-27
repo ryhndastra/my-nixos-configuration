@@ -19,6 +19,7 @@
     btop
     curl
     dnsutils
+    efibootmgr
     fastfetch
     fd
     file
