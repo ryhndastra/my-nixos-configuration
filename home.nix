@@ -132,12 +132,11 @@ in
       };
     };
 
-    # Two-Panel Aesthetic Layout (Top Minimal Status Bar + Bottom Floating App Dock)
+    # Sleek Minimal Top Floating Island Bar (No bottom dock, matches Nadir aesthetic)
     panels = [
-      # 1. Top Floating Status Island
       {
         location = "top";
-        height = 34;
+        height = 32;
         floating = true;
         alignment = "center";
         screen = "all";
@@ -167,38 +166,21 @@ in
           }
           "org.kde.plasma.panelspacer"
 
-          # Right: Media Controller + System Tray
+          # Right: Pager (Workspaces) + Media Player + System Tray
+          {
+            name = "org.kde.plasma.pager";
+            config = {
+              General = {
+                showWindowIcons = true;
+                displayedText = "Number";
+              };
+            };
+          }
           {
             name = "org.kde.plasma.mediacontroller";
           }
           {
             name = "org.kde.plasma.systemtray";
-          }
-        ];
-      }
-
-      # 2. Bottom Floating App Dock (Capsule Pill Dock)
-      {
-        location = "bottom";
-        height = 54;
-        floating = true;
-        lengthMode = "custom";
-        alignment = "center";
-        screen = "all";
-        widgets = [
-          {
-            name = "org.kde.plasma.icontasks";
-            config = {
-              General = {
-                launchers = [
-                  "applications:zen-beta.desktop"
-                  "applications:kitty.desktop"
-                  "applications:org.gnome.Nautilus.desktop"
-                  "applications:code.desktop"
-                  "applications:spotify.desktop"
-                ];
-              };
-            };
           }
         ];
       }
@@ -262,6 +244,7 @@ in
 
     configFile = {
       "kdeglobals"."KDE"."widgetStyle" = "Breeze";
+      "plasmarc"."Theme"."name" = "ROUNDED-COLOR-OPAQUE-CUSTOM";
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
@@ -276,9 +259,9 @@ in
       "kwinrc"."Effect-shapecorners"."Shadow" = true;
       "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
 
-      # Sleek Modern Window Decorations (Mac Traffic Light buttons)
+      # Custom Sweet Dark Transparent Mac Traffic Light Window Decoration
       "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";
-      "kwinrc"."org.kde.kdecoration2"."theme" = "__aurorae__svg__CatppuccinFrappe-Modern";
+      "kwinrc"."org.kde.kdecoration2"."theme" = "__aurorae__svg__Sweet-Dark-transparent-Custom";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
       "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
@@ -303,16 +286,26 @@ in
       "kwinrulesrc"."1"."types" = "1";
       "kwinrulesrc"."1"."wmclassmatch" = 0;
       "kwinrulesrc"."1"."size" = "1040,650";
-      "kwinrulesrc"."1"."sizerule" = 3; # 3 = Apply initially
+      "kwinrulesrc"."1"."sizerule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."1"."position" = "center";
-      "kwinrulesrc"."1"."positionrule" = 3; # 3 = Apply initially
+      "kwinrulesrc"."1"."positionrule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."1"."maximizehoriz" = false;
-      "kwinrulesrc"."1"."maximizehorizrule" = 3; # 3 = Apply initially
+      "kwinrulesrc"."1"."maximizehorizrule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."1"."maximizevert" = false;
-      "kwinrulesrc"."1"."maximizevertrule" = 3; # 3 = Apply initially
+      "kwinrulesrc"."1"."maximizevertrule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."General"."count" = 1;
       "kwinrulesrc"."General"."rules" = "1";
     };
+  };
+
+  # Link Nadir Custom Rice Themes (Aurorae & Plasma Desktop Theme)
+  xdg.dataFile."aurorae/themes/Sweet-Dark-transparent-Custom" = {
+    source = ./dotfiles/kde/themes/Sweet-Dark-transparent-Custom;
+    recursive = true;
+  };
+  xdg.dataFile."plasma/desktoptheme/ROUNDED-COLOR-OPAQUE-CUSTOM" = {
+    source = ./dotfiles/kde/themes/ROUNDED-COLOR-OPAQUE-CUSTOM;
+    recursive = true;
   };
 
   home.sessionVariables = {
