@@ -2,550 +2,354 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
 import Quickshell.Io
 
+// ============================================================
+// shell.qml — Quickshell Bar Entry Point
+// Manages all state, system polling, and PanelWindow layout.
+// Visual widgets live in separate component files.
+// ============================================================
 ShellRoot {
-    PanelWindow {
-        id: topBar
-        anchors {
-            top: true
-            left: true
-            right: true
+    id: root
+
+    // === Global Bar State ===
+    property int  activeDesktop:  1
+    property string openDropdown: ""   // "clock" | "stats" | "volume" | "battery" | ""
+
+    // === Media / MPRIS State ===
+    property string playerName:   ""
+    property string playerIcon:   "󰎆"
+    property string trackTitle:   ""
+    property string trackArtist:  ""
+    property bool   isPlaying:    false
+
+    // === System Stats State ===
+    property int    cpuPercent:   0
+    property string ramText:      "--"
+    property int    ramUsedMB:    0
+    property int    ramTotalMB:   24000
+
+    // === Battery State ===
+    property int  batteryPercent: 0
+    property bool batteryCharging: false
+
+    // === Volume State ===
+    property int  volumePercent:  80
+    property bool volumeMuted:    false
+
+    // ─────────────────────────────────────────────────────────
+    // SYSTEM POLLING — all Process objects live here
+    // ─────────────────────────────────────────────────────────
+
+    // 1. Active Desktop (poll every 350ms)
+    Process {
+        id: desktopProc
+        command: ["sh", "-c", "qdbus org.kde.KWin /KWin currentDesktop 2>/dev/null || echo 1"]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var n = parseInt(line.trim())
+                if (!isNaN(n) && n >= 1 && n <= 5) root.activeDesktop = n
+            }
         }
-        height: 44
+    }
+    Timer {
+        interval: 350; running: true; repeat: true
+        onTriggered: if (!desktopProc.running) desktopProc.running = true
+    }
+
+    // 2. RAM (poll every 3s)
+    Process {
+        id: ramProc
+        command: ["sh", "-c", "free -m | awk 'NR==2{printf \"%dM/%dM|%d|%d\", $3, $2, $3, $2}'"]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var parts = line.trim().split("|")
+                if (parts.length >= 3) {
+                    root.ramText   = parts[0]
+                    root.ramUsedMB = parseInt(parts[1]) || 0
+                    root.ramTotalMB= parseInt(parts[2]) || 24000
+                }
+            }
+        }
+    }
+
+    // 3. CPU (poll every 5s — vmstat takes 1s)
+    Process {
+        id: cpuProc
+        command: ["sh", "-c", "vmstat 1 2 2>/dev/null | tail -1 | awk '{print 100-$15}'"]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var v = parseInt(line.trim())
+                if (!isNaN(v)) root.cpuPercent = v
+            }
+        }
+    }
+
+    // 4. Battery (poll every 5s)
+    Process {
+        id: batProc
+        command: ["sh", "-c", "cap=$(cat /sys/class/power_supply/BAT1/capacity 2>/dev/null); chg=$(cat /sys/class/power_supply/ADP1/online 2>/dev/null); echo \"${cap:-0}|${chg:-0}\""]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var parts = line.trim().split("|")
+                if (parts.length >= 2) {
+                    var cap = parseInt(parts[0])
+                    if (!isNaN(cap)) root.batteryPercent = cap
+                    root.batteryCharging = parts[1].trim() === "1"
+                }
+            }
+        }
+    }
+
+    // 5. Volume (poll every 2s)
+    Process {
+        id: volProc
+        command: ["sh", "-c", "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null"]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var l = line.trim()
+                var parts = l.split(" ")
+                if (parts.length >= 2) {
+                    var pct = Math.round(parseFloat(parts[1]) * 100)
+                    if (!isNaN(pct)) root.volumePercent = Math.max(0, Math.min(150, pct))
+                }
+                root.volumeMuted = l.includes("[MUTED]")
+            }
+        }
+    }
+
+    // 6. MPRIS Media Player (poll every 2s)
+    Process {
+        id: mediaProc
+        command: ["sh", "-c", "playerctl -a metadata --format '{{playerName}}|||{{title}}|||{{artist}}|||{{status}}' 2>/dev/null | head -1"]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var l = line.trim()
+                if (l === "" || l.startsWith("No players")) {
+                    root.playerName = ""; root.trackTitle = ""; root.trackArtist = ""; root.isPlaying = false
+                    return
+                }
+                var p = l.split("|||")
+                var pn = (p[0] || "").toLowerCase()
+                root.playerName   = pn
+                root.trackTitle   = p[1] || ""
+                root.trackArtist  = p[2] || ""
+                root.isPlaying    = (p[3] || "").trim() === "Playing"
+
+                // Dynamic player icon based on player name
+                if      (pn.includes("spotify"))                  root.playerIcon = "󰓇"
+                else if (pn.includes("zen") || pn.includes("firefox") ||
+                         pn.includes("brave") || pn.includes("chrome")) root.playerIcon = "󰈹"
+                else if (pn.includes("mpv"))                      root.playerIcon = "󰕼"
+                else if (pn.includes("vlc"))                      root.playerIcon = "󰕼"
+                else if (pn.includes("rhythmbox") || pn.includes("lollypop")) root.playerIcon = "󰎵"
+                else                                              root.playerIcon = "󰎆"
+            }
+        }
+    }
+
+    // Polling timers
+    Timer { interval: 3000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: { if (!ramProc.running) ramProc.running = true; if (!batProc.running) batProc.running = true } }
+    Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: { if (!volProc.running) volProc.running = true; if (!mediaProc.running) mediaProc.running = true } }
+    Timer { interval: 5000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: if (!cpuProc.running) cpuProc.running = true }
+
+    // ─────────────────────────────────────────────────────────
+    // PANEL WINDOW — the floating glass bar
+    // ─────────────────────────────────────────────────────────
+    PanelWindow {
+        id: barWindow
+
+        anchors { top: true; left: true; right: true }
+        // Expand height to accommodate dropdown panels
+        implicitHeight: 46 + (root.openDropdown !== "" ? dropdownHeight : 0)
         color: "transparent"
 
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell-bar"
 
-        // Center Floating Frosted Acrylic Glass Capsule
+        readonly property int barH: 44
+        readonly property int dropdownHeight: 250
+
+        // ── Dismiss overlay: tap anywhere below bar to close dropdown ──
+        MouseArea {
+            anchors { top: parent.top; topMargin: barWindow.barH; left: parent.left; right: parent.right; bottom: parent.bottom }
+            visible: root.openDropdown !== ""
+            z: 5
+            onClicked: root.openDropdown = ""
+        }
+
+        // ── Main Glass Capsule Bar ──
         Rectangle {
             id: barCapsule
             anchors {
-                top: parent.top
-                topMargin: 4
-                bottom: parent.bottom
-                bottomMargin: 3
-                left: parent.left
-                leftMargin: 12
-                right: parent.right
-                rightMargin: 12
+                top: parent.top; topMargin: 5
+                left: parent.left; leftMargin: 10
+                right: parent.right; rightMargin: 10
             }
+            height: 34
             radius: 12
-            color: "#66181825" // Translucent Glass Background
-            border.color: "#80cba6f7" // Sakura Lavender Outline
-            border.width: 1.2
+            color: "#c8181825"       // More opaque — 78% solid
+            border.color: "#90cba6f7"
+            border.width: 1.5
+            z: 10
 
-            // Top Glass Specular Highlight
+            // Top glass specular sheen
             Rectangle {
-                anchors {
-                    top: parent.top
-                    topMargin: 1
-                    left: parent.left
-                    leftMargin: 16
-                    right: parent.right
-                    rightMargin: 16
-                }
-                height: 1
-                color: "#40ffffff"
-                radius: 1
+                anchors { top: parent.top; topMargin: 1; left: parent.left; leftMargin: 14; right: parent.right; rightMargin: 14 }
+                height: 1; color: "#40ffffff"; radius: 1
             }
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 10
-                anchors.rightMargin: 10
-                spacing: 8
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                spacing: 6
 
-                // ==================== LEFT ====================
-
-                // 1. NixOS Sakura Launcher
+                // ── LEFT ──────────────────────────────────────────
+                // NixOS Launcher Button
                 Rectangle {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 32
-                    Layout.preferredHeight: 26
-                    radius: 7
-                    color: launcherMouse.containsMouse ? "#40cba6f7" : "#20cba6f7"
-                    border.color: launcherMouse.containsMouse ? "#cba6f7" : "#40cba6f7"
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 22
+                    radius: 6
+                    color: nixMa.containsMouse ? "#40cba6f7" : "#20cba6f7"
+                    border.color: nixMa.containsMouse ? "#cba6f7" : "#35cba6f7"
                     border.width: 1
-
                     Text {
-                        anchors.centerIn: parent
-                        text: "󱄅"
-                        font.pixelSize: 16
-                        color: launcherMouse.containsMouse ? "#ffffff" : "#cba6f7"
+                        anchors.centerIn: parent; text: "󱄅"
+                        font.pixelSize: 14; color: "#cba6f7"
                     }
-
                     MouseArea {
-                        id: launcherMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
+                        id: nixMa; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: Quickshell.execDetached(["qdbus", "org.kde.krunner", "/App", "display"])
                     }
                 }
 
-                // 2. Workspaces 1..5
-                Rectangle {
+                // Workspace pills
+                WorkspaceWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.preferredWidth: wsRow.implicitWidth + 8
-                    radius: 7
-                    color: "#3011111b"
-                    border.color: "#30cba6f7"
-                    border.width: 1
-
-                    Row {
-                        id: wsRow
-                        anchors.centerIn: parent
-                        spacing: 4
-
-                        Repeater {
-                            model: [1, 2, 3, 4, 5]
-                            Rectangle {
-                                width: 22
-                                height: 20
-                                radius: 5
-                                color: wsMouse.containsMouse ? "#60cba6f7" : "#20313244"
-                                border.color: wsMouse.containsMouse ? "#cba6f7" : "transparent"
-                                border.width: 1
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: modelData
-                                    font.pixelSize: 11
-                                    font.family: "JetBrainsMono Nerd Font"
-                                    font.bold: true
-                                    color: wsMouse.containsMouse ? "#ffffff" : "#cdd6f4"
-                                }
-
-                                MouseArea {
-                                    id: wsMouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: Quickshell.execDetached(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
-                                }
-                            }
-                        }
-                    }
+                    activeDesktop: root.activeDesktop
+                    onDesktopClicked: (d) => Quickshell.execDetached(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", "" + d])
                 }
 
-                // 3. Media Player Widget (Spotify / Playerctl)
-                Rectangle {
+                // Media player (hidden when no player)
+                MediaWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.maximumWidth: 260
-                    Layout.preferredWidth: mediaRow.implicitWidth + 14
-                    radius: 7
-                    color: "#2511111b"
-                    border.color: "#30a6e3a1"
-                    border.width: 1
-                    clip: true
-
-                    RowLayout {
-                        id: mediaRow
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
-                        spacing: 6
-
-                        Text {
-                            Layout.alignment: Qt.AlignVCenter
-                            text: "󰓇"
-                            font.pixelSize: 13
-                            color: "#a6e3a1"
-                        }
-
-                        Text {
-                            id: trackTitle
-                            Layout.alignment: Qt.AlignVCenter
-                            Layout.maximumWidth: 160
-                            text: "Media Player"
-                            font.pixelSize: 11
-                            font.family: "Noto Sans CJK JP"
-                            color: "#cdd6f4"
-                            elide: Text.ElideRight
-                        }
-
-                        // Prev
-                        Text {
-                            Layout.alignment: Qt.AlignVCenter
-                            text: "󰒮"
-                            font.pixelSize: 12
-                            color: prevMouse.containsMouse ? "#ffffff" : "#a6adc8"
-                            MouseArea {
-                                id: prevMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["playerctl", "previous"])
-                            }
-                        }
-
-                        // Play/Pause
-                        Text {
-                            Layout.alignment: Qt.AlignVCenter
-                            text: "󰐊"
-                            font.pixelSize: 12
-                            color: playMouse.containsMouse ? "#ffffff" : "#a6e3a1"
-                            MouseArea {
-                                id: playMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["playerctl", "play-pause"])
-                            }
-                        }
-
-                        // Next
-                        Text {
-                            Layout.alignment: Qt.AlignVCenter
-                            text: "󰒭"
-                            font.pixelSize: 12
-                            color: nextMouse.containsMouse ? "#ffffff" : "#a6adc8"
-                            MouseArea {
-                                id: nextMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["playerctl", "next"])
-                            }
-                        }
-                    }
+                    visible: root.playerName !== ""
+                    playerIcon: root.playerIcon
+                    playerName: root.playerName
+                    isPlaying: root.isPlaying
+                    trackTitle: root.trackTitle
+                    trackArtist: root.trackArtist
+                    onPrev: Quickshell.execDetached(["playerctl", "previous"])
+                    onPlayPause: Quickshell.execDetached(["playerctl", "play-pause"])
+                    onNext: Quickshell.execDetached(["playerctl", "next"])
                 }
 
                 Item { Layout.fillWidth: true }
 
-                // ==================== CENTER ====================
-
-                // 4. Japanese Date & Clock Pill
-                Rectangle {
+                // ── CENTER ────────────────────────────────────────
+                ClockWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.preferredWidth: clockLayout.implicitWidth + 18
-                    radius: 7
-                    color: clockMouse.containsMouse ? "#40313244" : "#2511111b"
-                    border.color: "#40cba6f7"
-                    border.width: 1
-
-                    RowLayout {
-                        id: clockLayout
-                        anchors.centerIn: parent
-                        spacing: 6
-
-                        Text {
-                            Layout.alignment: Qt.AlignVCenter
-                            text: "󰃰"
-                            font.pixelSize: 12
-                            color: "#cba6f7"
-                        }
-
-                        Text {
-                            id: clockDisplay
-                            Layout.alignment: Qt.AlignVCenter
-                            font.pixelSize: 12
-                            font.family: "Noto Sans CJK JP"
-                            font.bold: true
-                            color: "#f5e0dc"
-
-                            Timer {
-                                interval: 1000
-                                running: true
-                                repeat: true
-                                triggeredOnStart: true
-                                onTriggered: {
-                                    var now = new Date();
-                                    var hours = now.getHours();
-                                    var minutes = now.getMinutes();
-                                    var ampm = hours >= 12 ? 'PM' : 'AM';
-                                    hours = hours % 12;
-                                    hours = hours ? hours : 12;
-                                    var minStr = minutes < 10 ? '0' + minutes : minutes;
-                                    var m = now.getMonth() + 1;
-                                    var d = now.getDate();
-                                    var days = ['日', '月', '火', '水', '木', '金', '土'];
-                                    clockDisplay.text = hours + ':' + minStr + ' ' + ampm + ' • ' + m + '月' + d + '日 (' + days[now.getDay()] + ')';
-                                }
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        id: clockMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: Quickshell.execDetached(["plasma-systemmonitor"])
-                    }
+                    isOpen: root.openDropdown === "clock"
+                    onClicked: root.openDropdown = root.openDropdown === "clock" ? "" : "clock"
                 }
 
                 Item { Layout.fillWidth: true }
 
-                // ==================== RIGHT ====================
-
-                // 5. System Stats (RAM & CPU)
-                Rectangle {
+                // ── RIGHT ─────────────────────────────────────────
+                StatsWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.preferredWidth: statsRow.implicitWidth + 14
-                    radius: 7
-                    color: statsMouse.containsMouse ? "#35313244" : "#2511111b"
-                    border.color: "#3089dceb"
-                    border.width: 1
-
-                    Row {
-                        id: statsRow
-                        anchors.centerIn: parent
-                        spacing: 8
-
-                        // RAM
-                        Row {
-                            spacing: 3
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "󰍛"
-                                font.pixelSize: 12
-                                color: "#89dceb"
-                            }
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "RAM"
-                                font.pixelSize: 11
-                                font.family: "JetBrainsMono Nerd Font"
-                                color: "#cdd6f4"
-                            }
-                        }
-
-                        // CPU
-                        Row {
-                            spacing: 3
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "󰻠"
-                                font.pixelSize: 12
-                                color: "#f9e2af"
-                            }
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "CPU"
-                                font.pixelSize: 11
-                                font.family: "JetBrainsMono Nerd Font"
-                                color: "#cdd6f4"
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        id: statsMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: Quickshell.execDetached(["plasma-systemmonitor"])
-                    }
+                    cpuPercent: root.cpuPercent
+                    ramText: root.ramText
+                    isOpen: root.openDropdown === "stats"
+                    onClicked: root.openDropdown = root.openDropdown === "stats" ? "" : "stats"
                 }
 
-                // 6. Volume Control (Scroll up/down for volume, click to mute)
-                Rectangle {
+                VolumeWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.preferredWidth: volRow.implicitWidth + 12
-                    radius: 7
-                    color: volMouse.containsMouse ? "#35313244" : "#2511111b"
-                    border.color: "#30fab387"
-                    border.width: 1
-
-                    Row {
-                        id: volRow
-                        anchors.centerIn: parent
-                        spacing: 4
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "󰕾"
-                            font.pixelSize: 13
-                            color: "#fab387"
-                        }
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "VOL"
-                            font.pixelSize: 11
-                            font.family: "JetBrainsMono Nerd Font"
-                            color: "#cdd6f4"
-                        }
+                    volumePercent: root.volumePercent
+                    muted: root.volumeMuted
+                    isOpen: root.openDropdown === "volume"
+                    onScroll: (up) => {
+                        Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", up ? "5%+" : "5%-"])
+                        if (!volProc.running) volProc.running = true
                     }
-
-                    MouseArea {
-                        id: volMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onWheel: (wheel) => {
-                            if (wheel.angleDelta.y > 0) {
-                                Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+"]);
-                            } else {
-                                Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"]);
-                            }
-                        }
-                        onClicked: Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
-                    }
+                    onClicked: root.openDropdown = root.openDropdown === "volume" ? "" : "volume"
                 }
 
-                // 7. Battery Indicator
-                Rectangle {
+                BatteryWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.preferredWidth: batRow.implicitWidth + 12
-                    radius: 7
-                    color: "#2511111b"
-                    border.color: "#30a6e3a1"
-                    border.width: 1
-
-                    Row {
-                        id: batRow
-                        anchors.centerIn: parent
-                        spacing: 4
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "󰁹"
-                            font.pixelSize: 13
-                            color: "#a6e3a1"
-                        }
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "BAT"
-                            font.pixelSize: 11
-                            font.family: "JetBrainsMono Nerd Font"
-                            color: "#cdd6f4"
-                        }
-                    }
+                    batteryPercent: root.batteryPercent
+                    charging: root.batteryCharging
+                    isOpen: root.openDropdown === "battery"
+                    onClicked: root.openDropdown = root.openDropdown === "battery" ? "" : "battery"
                 }
 
-                // 8. Action Launchers (Kitty, Zen, Screenshot, Lock)
-                Rectangle {
+                ActionHub {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredHeight: 26
-                    Layout.preferredWidth: actRow.implicitWidth + 12
-                    radius: 7
-                    color: "#2511111b"
-                    border.color: "#30cba6f7"
-                    border.width: 1
-
-                    Row {
-                        id: actRow
-                        anchors.centerIn: parent
-                        spacing: 6
-
-                        // Terminal
-                        Rectangle {
-                            width: 20
-                            height: 20
-                            radius: 5
-                            color: tMouse.containsMouse ? "#4089b4fa" : "transparent"
-                            Text {
-                                anchors.centerIn: parent
-                                text: ""
-                                font.pixelSize: 12
-                                color: "#89b4fa"
-                            }
-                            MouseArea {
-                                id: tMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["kitty"])
-                            }
-                        }
-
-                        // Browser
-                        Rectangle {
-                            width: 20
-                            height: 20
-                            radius: 5
-                            color: bMouse.containsMouse ? "#40fab387" : "transparent"
-                            Text {
-                                anchors.centerIn: parent
-                                text: "󰈹"
-                                font.pixelSize: 12
-                                color: "#fab387"
-                            }
-                            MouseArea {
-                                id: bMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["zen-beta"])
-                            }
-                        }
-
-                        // Screenshot Spectacle
-                        Rectangle {
-                            width: 20
-                            height: 20
-                            radius: 5
-                            color: sMouse.containsMouse ? "#40a6e3a1" : "transparent"
-                            Text {
-                                anchors.centerIn: parent
-                                text: "󰹑"
-                                font.pixelSize: 12
-                                color: "#a6e3a1"
-                            }
-                            MouseArea {
-                                id: sMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["spectacle", "-r"])
-                            }
-                        }
-
-                        // Lock Screen
-                        Rectangle {
-                            width: 20
-                            height: 20
-                            radius: 5
-                            color: lMouse.containsMouse ? "#40f38ba8" : "transparent"
-                            Text {
-                                anchors.centerIn: parent
-                                text: "󰌾"
-                                font.pixelSize: 12
-                                color: "#f38ba8"
-                            }
-                            MouseArea {
-                                id: lMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["loginctl", "lock-session"])
-                            }
-                        }
-
-                        // Logout / Power Menu
-                        Rectangle {
-                            width: 20
-                            height: 20
-                            radius: 5
-                            color: pMouse.containsMouse ? "#60f38ba8" : "#20f38ba8"
-                            Text {
-                                anchors.centerIn: parent
-                                text: "󰐥"
-                                font.pixelSize: 12
-                                color: "#f38ba8"
-                            }
-                            MouseArea {
-                                id: pMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Quickshell.execDetached(["qdbus", "org.kde.Shutdown", "/Shutdown", "logoutAndPrompt"])
-                            }
-                        }
-                    }
+                    onLaunchKitty:    Quickshell.execDetached(["kitty"])
+                    onLaunchBrowser:  Quickshell.execDetached(["zen-beta"])
+                    onScreenshot:     Quickshell.execDetached(["spectacle", "-r"])
+                    onLockScreen:     Quickshell.execDetached(["loginctl", "lock-session"])
+                    onLogout:         Quickshell.execDetached(["qdbus", "org.kde.Shutdown", "/Shutdown", "logoutAndPrompt"])
                 }
             }
+        }
+
+        // ── Dropdown Panels (appear below capsule on click) ────
+        // Calendar Dropdown (Clock widget)
+        CalendarDropdown {
+            visible: root.openDropdown === "clock"
+            anchors { top: barCapsule.bottom; topMargin: 6; horizontalCenter: barWindow.horizontalCenter }
+            z: 20
+            Behavior on opacity { NumberAnimation { duration: 150 } }
+            opacity: visible ? 1 : 0
+        }
+
+        // Stats Dropdown
+        StatsDropdown {
+            visible: root.openDropdown === "stats"
+            cpuPercent: root.cpuPercent
+            ramText: root.ramText
+            ramUsedMB: root.ramUsedMB
+            ramTotalMB: root.ramTotalMB
+            anchors { top: barCapsule.bottom; topMargin: 6; right: barWindow.right; rightMargin: 140 }
+            z: 20
+            opacity: visible ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 150 } }
+        }
+
+        // Volume Dropdown
+        VolumeDropdown {
+            visible: root.openDropdown === "volume"
+            volumePercent: root.volumePercent
+            muted: root.volumeMuted
+            onScroll: (up) => Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", up ? "5%+" : "5%-"])
+            onMuteToggle: {
+                Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                if (!volProc.running) volProc.running = true
+            }
+            anchors { top: barCapsule.bottom; topMargin: 6; right: barWindow.right; rightMargin: 80 }
+            z: 20
+            opacity: visible ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 150 } }
+        }
+
+        // Battery Dropdown
+        BatteryDropdown {
+            visible: root.openDropdown === "battery"
+            batteryPercent: root.batteryPercent
+            charging: root.batteryCharging
+            anchors { top: barCapsule.bottom; topMargin: 6; right: barWindow.right; rightMargin: 20 }
+            z: 20
+            opacity: visible ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 150 } }
         }
     }
 }

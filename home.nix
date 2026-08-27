@@ -197,19 +197,18 @@ in
     };
 
     configFile = {
-      # KWin GPU Frosted Glass Blur & Window Translucency (Frosted Glass on all Apps)
+      # KWin Plugins: disable flickering auto-tilers & raw translucency effect
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."poloniumEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
-      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = true;
-      "kwinrc"."Effect-translucency"."ActiveWindow" = 88;
-      "kwinrc"."Effect-translucency"."InactiveWindow" = 78;
-      "kwinrc"."Effect-translucency"."Dialogs" = 85;
-      "kwinrc"."Effect-translucency"."Menus" = 85;
-      "kwinrc"."Effect-translucency"."MoveResize" = 75;
+      # NOTE: kwin4_effect_translucency causes FLICKERING when combined with shapecorners shader.
+      # Use per-app transparency instead (kitty background_opacity, etc.)
+      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = false;
+      # Enable native GPU blur — makes transparent app backgrounds (kitty etc.) frosted
+      "kwinrc"."Plugins"."blurEnabled" = true;
 
-      # KWin Plasma 6 Native Quick Tiling & 10px Window Gaps
-      "kwinrc"."Tiling"."padding" = 10;
+      # KWin Plasma 6 Native Quick Tiling & 24px Window Gaps
+      "kwinrc"."Tiling"."padding" = 24;
       "kwinrc"."Tiling"."activeByDefault" = true;
       "kwinrc"."Windows"."ElectricBorders" = 2;
       "kwinrc"."Windows"."ElectricBorderTiling" = true;
@@ -221,8 +220,8 @@ in
       "kwinrc"."Effect-shapecorners"."RoundCorners" = true;
       "kwinrc"."Effect-shapecorners"."CornerRadius" = 14;
       "kwinrc"."Effect-shapecorners"."Outline" = true;
-      "kwinrc"."Effect-shapecorners"."OutlineThickness" = 1.5;
-      "kwinrc"."Effect-shapecorners"."OutlineColor" = "203,166,247,190";
+      "kwinrc"."Effect-shapecorners"."OutlineThickness" = 2.5;
+      "kwinrc"."Effect-shapecorners"."OutlineColor" = "203,166,247,210";
       "kwinrc"."Effect-shapecorners"."Shadow" = true;
       "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
 
@@ -265,8 +264,11 @@ in
     };
   };
 
-  # Quickshell Translucent Blurry Top Bar
-  xdg.configFile."quickshell/shell.qml".source = ./dotfiles/quickshell/shell.qml;
+  # Quickshell Bar - source whole directory for multi-file QML components
+  xdg.configFile."quickshell" = {
+    source = ./dotfiles/quickshell;
+    recursive = true;
+  };
   xdg.configFile."autostart/quickshell.desktop".text = ''
     [Desktop Entry]
     Type=Application
