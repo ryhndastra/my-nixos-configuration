@@ -110,12 +110,7 @@ in
         wobblyWindows.enable = false;
       };
       nightLight = {
-        enable = true;
-        mode = "times";
-        time = {
-          evening = "18:00";
-          morning = "06:00";
-        };
+        enable = false;
       };
       virtualDesktops = {
         number = 5;
@@ -192,7 +187,7 @@ in
       }
     ];
 
-    # Keybindings (Single Super for Launcher + Niri/Hyprland Shortcuts)
+    # Keybindings (Single Super for Launcher + Niri/Hyprland Shortcuts + Quick Tiling)
     shortcuts = {
       # Applications
       "services/kitty.desktop"."_launch" = "Meta+T";
@@ -208,7 +203,7 @@ in
       "krunner.desktop"."_launch" = "Meta+D";
       "org.kde.krunner.desktop"."_launch" = "Meta+D";
 
-      # Window Controls (Niri/Hyprland Style)
+      # Window Controls
       "kwin"."Window Close" = "Meta+Q";
       "kwin"."Window Maximize" = "Meta+F";
       "kwin"."Window Fullscreen" = "Meta+Shift+F";
@@ -217,7 +212,15 @@ in
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
-      # Window Resize (Niri / Hyprland Style)
+      # Quick Tiling (Make Window Tiled / Half / Quarter Screen)
+      "kwin"."Window Quick Tile Left" = "Meta+Left";
+      "kwin"."Window Quick Tile Right" = "Meta+Right";
+      "kwin"."Window Quick Tile Top" = "Meta+Up";
+      "kwin"."Window Quick Tile Bottom" = "Meta+Down";
+      "kwin"."Window Quick Tile Top Left" = "Meta+Shift+Left";
+      "kwin"."Window Quick Tile Top Right" = "Meta+Shift+Right";
+
+      # Window Resize via Keyboard
       "kwin"."Window Grow Horizontal" = "Meta+Ctrl+Right";
       "kwin"."Window Shrink Horizontal" = "Meta+Ctrl+Left";
       "kwin"."Window Grow Vertical" = "Meta+Ctrl+Up";
@@ -245,12 +248,33 @@ in
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
+
+      # Mouse on Focus (Focus Follows Mouse)
+      "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
+      "kwinrc"."Windows"."NextFocusPrefersMouse" = true;
+      "kwinrc"."Windows"."DelayFocusInterval" = 0;
+      "kwinrc"."Windows"."AutoRaise" = false;
+
+      # Window Placement & Dimensions (Moderate Centered Floating Window by default)
       "kwinrc"."Windows"."Placement" = "Centered";
       "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
       "kwinrc"."Windows"."CommandAllKey" = "Meta";
       "kwinrc"."Windows"."CommandAll1" = "Move";
       "kwinrc"."Windows"."CommandAll2" = "Resize";
       "kwinrc"."Windows"."CommandAll3" = "Maximize";
+
+      # Default Moderate Initial Window Size Rule (1060x660 centered, not auto-maximized)
+      "kwinrulesrc"."1"."Description" = "Default Centered Moderate Window Size";
+      "kwinrulesrc"."1"."types" = "1";
+      "kwinrulesrc"."1"."wmclassmatch" = 0;
+      "kwinrulesrc"."1"."size" = "1060,660";
+      "kwinrulesrc"."1"."sizerule" = 4; # Apply initially
+      "kwinrulesrc"."1"."maximizehoriz" = false;
+      "kwinrulesrc"."1"."maximizehorizrule" = 4;
+      "kwinrulesrc"."1"."maximizevert" = false;
+      "kwinrulesrc"."1"."maximizevertrule" = 4;
+      "kwinrulesrc"."General"."count" = 1;
+      "kwinrulesrc"."General"."rules" = "1";
     };
   };
 
