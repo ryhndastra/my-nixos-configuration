@@ -56,7 +56,6 @@
     kdePackages.dolphin
     kdePackages.kdegraphics-thumbnailers
     kdePackages.ffmpegthumbs
-    kdePackages.krohnkite
     kdePackages.kcalc
     kdePackages.ark
     kdePackages.plasma-browser-integration
