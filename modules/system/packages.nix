@@ -53,7 +53,6 @@
     kde-rounded-corners
     plasma-panel-colorizer
     papirus-icon-theme
-    polonium
     quickshell
     kdePackages.plasma-systemmonitor
     kdePackages.spectacle

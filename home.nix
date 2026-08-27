@@ -197,27 +197,19 @@ in
     };
 
     configFile = {
-      "kdeglobals"."KDE"."widgetStyle" = "Breeze";
-      "plasmarc"."Theme"."name" = "ROUNDED-COLOR-OPAQUE-CUSTOM";
-      "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
+      # Disable Auto-Tilers & Raw Translucency to prevent resizing locks and flickering
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
+      "kwinrc"."Plugins"."poloniumEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
+      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = false;
 
-      # KWin Plasma 6 Native Tiling & 10px Window Gaps (Matching Nadir Screenshot)
+      # KWin Plasma 6 Native Quick Tiling & 10px Window Gaps
       "kwinrc"."Tiling"."padding" = 10;
       "kwinrc"."Tiling"."activeByDefault" = true;
       "kwinrc"."Windows"."ElectricBorders" = 2;
       "kwinrc"."Windows"."ElectricBorderTiling" = true;
       "kwinrc"."Windows"."ElectricBorderMaximize" = false;
       "kwinrc"."Windows"."CornerBarrier" = false;
-
-      # KWin GPU Frosted Glass Blur & Window Translucency
-      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = true;
-      "kwinrc"."Effect-translucency"."ActiveWindow" = 92;
-      "kwinrc"."Effect-translucency"."InactiveWindow" = 82;
-      "kwinrc"."Effect-translucency"."Dialogs" = 90;
-      "kwinrc"."Effect-translucency"."Menus" = 85;
-      "kwinrc"."Effect-translucency"."MoveResize" = 80;
 
       # Native KWin Smooth Rounded Corners Shader (14px radius + Sakura Outline Border)
       "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
@@ -228,13 +220,6 @@ in
       "kwinrc"."Effect-shapecorners"."OutlineColor" = "203,166,247,190";
       "kwinrc"."Effect-shapecorners"."Shadow" = true;
       "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
-
-      # Polonium Plasma 6 Auto-Tiling & 10px Window Gaps
-      "kwinrc"."Plugins"."poloniumEnabled" = true;
-      "kwinrc"."Script-polonium"."gap" = 10;
-      "kwinrc"."Script-polonium"."innerGap" = 10;
-      "kwinrc"."Script-polonium"."outerGap" = 10;
-      "kwinrc"."Script-polonium"."borderVisibility" = 0;
 
       # Custom Sweet Dark Transparent Mac Traffic Light Window Decoration
       "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";

@@ -3,12 +3,9 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
-import Quickshell.Services.Mpris
-import Quickshell.Services.Pipewire
 import Quickshell.Io
 
 ShellRoot {
-    // Top Floating Glass Island Bar
     PanelWindow {
         id: topBar
         anchors {
@@ -16,19 +13,19 @@ ShellRoot {
             left: true
             right: true
         }
-        height: 46
+        height: 44
         color: "transparent"
 
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell-bar"
 
-        // Center Floating Frosted Glass Capsule
+        // Center Floating Frosted Acrylic Glass Capsule
         Rectangle {
             id: barCapsule
             anchors {
                 top: parent.top
-                topMargin: 5
+                topMargin: 4
                 bottom: parent.bottom
                 bottomMargin: 3
                 left: parent.left
@@ -36,17 +33,12 @@ ShellRoot {
                 right: parent.right
                 rightMargin: 12
             }
-            radius: 13
-
-            // Deep Frosted Glass Acrylic Gradient
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#e61e1e2e" } // 90% Catppuccin Base
-                GradientStop { position: 1.0; color: "#d911111b" } // 85% Catppuccin Crust
-            }
-            border.color: "#80cba6f7" // Glowing Sakura Lavender Border
+            radius: 12
+            color: "#66181825" // Translucent Glass Background
+            border.color: "#80cba6f7" // Sakura Lavender Outline
             border.width: 1.2
 
-            // Top Glass Specular Highlight Sheen
+            // Top Glass Specular Highlight
             Rectangle {
                 anchors {
                     top: parent.top
@@ -57,7 +49,7 @@ ShellRoot {
                     rightMargin: 16
                 }
                 height: 1
-                color: "#45ffffff"
+                color: "#40ffffff"
                 radius: 1
             }
 
@@ -67,36 +59,41 @@ ShellRoot {
                 anchors.rightMargin: 10
                 spacing: 8
 
-                // ==================== LEFT SECTION ====================
+                // ==================== LEFT ====================
 
-                // 1. NixOS Sakura Launcher Button
+                // 1. NixOS Sakura Launcher
                 Rectangle {
-                    Layout.preferredWidth: 34
-                    Layout.preferredHeight: 28
-                    radius: 8
-                    color: launcherHover.hovered ? "#40cba6f7" : "#20cba6f7"
-                    border.color: launcherHover.hovered ? "#cba6f7" : "#40cba6f7"
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 32
+                    Layout.preferredHeight: 26
+                    radius: 7
+                    color: launcherMouse.containsMouse ? "#40cba6f7" : "#20cba6f7"
+                    border.color: launcherMouse.containsMouse ? "#cba6f7" : "#40cba6f7"
                     border.width: 1
 
                     Text {
                         anchors.centerIn: parent
                         text: "󱄅"
-                        font.pixelSize: 18
-                        color: launcherHover.hovered ? "#ffffff" : "#cba6f7"
+                        font.pixelSize: 16
+                        color: launcherMouse.containsMouse ? "#ffffff" : "#cba6f7"
                     }
 
-                    HoverHandler { id: launcherHover }
-                    TapHandler {
-                        onTapped: Process.exec(["qdbus", "org.kde.krunner", "/App", "display"])
+                    MouseArea {
+                        id: launcherMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Process.exec(["qdbus", "org.kde.krunner", "/App", "display"])
                     }
                 }
 
-                // 2. Interactive Workspaces (1..5)
+                // 2. Workspaces 1..5
                 Rectangle {
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.preferredWidth: wsRow.implicitWidth + 8
-                    radius: 8
-                    color: "#2511111b"
+                    radius: 7
+                    color: "#3011111b"
                     border.color: "#30cba6f7"
                     border.width: 1
 
@@ -108,11 +105,11 @@ ShellRoot {
                         Repeater {
                             model: [1, 2, 3, 4, 5]
                             Rectangle {
-                                width: 24
-                                height: 22
-                                radius: 6
-                                color: wsItemHover.hovered ? "#60cba6f7" : "#20313244"
-                                border.color: wsItemHover.hovered ? "#cba6f7" : "transparent"
+                                width: 22
+                                height: 20
+                                radius: 5
+                                color: wsMouse.containsMouse ? "#60cba6f7" : "#20313244"
+                                border.color: wsMouse.containsMouse ? "#cba6f7" : "transparent"
                                 border.width: 1
 
                                 Text {
@@ -121,26 +118,29 @@ ShellRoot {
                                     font.pixelSize: 11
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.bold: true
-                                    color: wsItemHover.hovered ? "#ffffff" : "#cdd6f4"
+                                    color: wsMouse.containsMouse ? "#ffffff" : "#cdd6f4"
                                 }
 
-                                HoverHandler { id: wsItemHover }
-                                TapHandler {
-                                    onTapped: Process.exec(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
+                                MouseArea {
+                                    id: wsMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: Process.exec(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
                                 }
                             }
                         }
                     }
                 }
 
-                // 3. Media Player Widget (Spotify / Mpris)
+                // 3. Media Player Widget (Spotify / Playerctl)
                 Rectangle {
-                    id: mprisPill
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.maximumWidth: 260
-                    Layout.preferredWidth: Math.min(mediaRow.implicitWidth + 14, 260)
-                    radius: 8
-                    color: mprisHover.hovered ? "#35313244" : "#2011111b"
+                    Layout.preferredWidth: mediaRow.implicitWidth + 14
+                    radius: 7
+                    color: "#2511111b"
                     border.color: "#30a6e3a1"
                     border.width: 1
                     clip: true
@@ -153,6 +153,7 @@ ShellRoot {
                         spacing: 6
 
                         Text {
+                            Layout.alignment: Qt.AlignVCenter
                             text: "󰓇"
                             font.pixelSize: 13
                             color: "#a6e3a1"
@@ -160,67 +161,73 @@ ShellRoot {
 
                         Text {
                             id: trackTitle
-                            Layout.fillWidth: true
-                            text: "Spotify / Media"
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.maximumWidth: 160
+                            text: "Media Player"
                             font.pixelSize: 11
                             font.family: "Noto Sans CJK JP"
                             color: "#cdd6f4"
                             elide: Text.ElideRight
                         }
 
+                        // Prev
                         Text {
+                            Layout.alignment: Qt.AlignVCenter
                             text: "󰒮"
                             font.pixelSize: 12
-                            color: prevHover.hovered ? "#ffffff" : "#a6adc8"
-                            HoverHandler { id: prevHover }
-                            TapHandler {
-                                onTapped: Process.exec(["playerctl", "previous"])
+                            color: prevMouse.containsMouse ? "#ffffff" : "#a6adc8"
+                            MouseArea {
+                                id: prevMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["playerctl", "previous"])
                             }
                         }
 
+                        // Play/Pause
                         Text {
+                            Layout.alignment: Qt.AlignVCenter
                             text: "󰐊"
                             font.pixelSize: 12
-                            color: playHover.hovered ? "#ffffff" : "#a6e3a1"
-                            HoverHandler { id: playHover }
-                            TapHandler {
-                                onTapped: Process.exec(["playerctl", "play-pause"])
+                            color: playMouse.containsMouse ? "#ffffff" : "#a6e3a1"
+                            MouseArea {
+                                id: playMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["playerctl", "play-pause"])
                             }
                         }
 
+                        // Next
                         Text {
+                            Layout.alignment: Qt.AlignVCenter
                             text: "󰒭"
                             font.pixelSize: 12
-                            color: nextHover.hovered ? "#ffffff" : "#a6adc8"
-                            HoverHandler { id: nextHover }
-                            TapHandler {
-                                onTapped: Process.exec(["playerctl", "next"])
+                            color: nextMouse.containsMouse ? "#ffffff" : "#a6adc8"
+                            MouseArea {
+                                id: nextMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["playerctl", "next"])
                             }
-                        }
-                    }
-
-                    HoverHandler { id: mprisHover }
-                    Timer {
-                        interval: 2000
-                        running: true
-                        repeat: true
-                        triggeredOnStart: true
-                        onTriggered: {
-                            var p = Process.exec(["playerctl", "metadata", "--format", "{{ artist }} - {{ title }}"]);
                         }
                     }
                 }
 
                 Item { Layout.fillWidth: true }
 
-                // ==================== CENTER SECTION ====================
+                // ==================== CENTER ====================
 
                 // 4. Japanese Date & Clock Pill
                 Rectangle {
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.preferredWidth: clockLayout.implicitWidth + 18
-                    radius: 8
-                    color: clockHover.hovered ? "#40313244" : "#2511111b"
+                    radius: 7
+                    color: clockMouse.containsMouse ? "#40313244" : "#2511111b"
                     border.color: "#40cba6f7"
                     border.width: 1
 
@@ -230,13 +237,15 @@ ShellRoot {
                         spacing: 6
 
                         Text {
+                            Layout.alignment: Qt.AlignVCenter
                             text: "󰃰"
-                            font.pixelSize: 13
+                            font.pixelSize: 12
                             color: "#cba6f7"
                         }
 
                         Text {
                             id: clockDisplay
+                            Layout.alignment: Qt.AlignVCenter
                             font.pixelSize: 12
                             font.family: "Noto Sans CJK JP"
                             font.bold: true
@@ -264,22 +273,26 @@ ShellRoot {
                         }
                     }
 
-                    HoverHandler { id: clockHover }
-                    TapHandler {
-                        onTapped: Process.exec(["plasma-systemmonitor"])
+                    MouseArea {
+                        id: clockMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Process.exec(["plasma-systemmonitor"])
                     }
                 }
 
                 Item { Layout.fillWidth: true }
 
-                // ==================== RIGHT SECTION ====================
+                // ==================== RIGHT ====================
 
-                // 5. System Resource Monitor (RAM / CPU Live stats)
+                // 5. System Stats (RAM & CPU)
                 Rectangle {
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.preferredWidth: statsRow.implicitWidth + 14
-                    radius: 8
-                    color: statsHover.hovered ? "#35313244" : "#2011111b"
+                    radius: 7
+                    color: statsMouse.containsMouse ? "#35313244" : "#2511111b"
                     border.color: "#3089dceb"
                     border.width: 1
 
@@ -292,13 +305,14 @@ ShellRoot {
                         Row {
                             spacing: 3
                             Text {
+                                anchors.verticalCenter: parent.verticalCenter
                                 text: "󰍛"
                                 font.pixelSize: 12
                                 color: "#89dceb"
                             }
                             Text {
-                                id: memText
-                                text: "4.2G"
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "RAM"
                                 font.pixelSize: 11
                                 font.family: "JetBrainsMono Nerd Font"
                                 color: "#cdd6f4"
@@ -309,13 +323,14 @@ ShellRoot {
                         Row {
                             spacing: 3
                             Text {
+                                anchors.verticalCenter: parent.verticalCenter
                                 text: "󰻠"
                                 font.pixelSize: 12
                                 color: "#f9e2af"
                             }
                             Text {
-                                id: cpuText
-                                text: "12%"
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "CPU"
                                 font.pixelSize: 11
                                 font.family: "JetBrainsMono Nerd Font"
                                 color: "#cdd6f4"
@@ -323,28 +338,22 @@ ShellRoot {
                         }
                     }
 
-                    HoverHandler { id: statsHover }
-                    TapHandler {
-                        onTapped: Process.exec(["plasma-systemmonitor"])
-                    }
-
-                    Timer {
-                        interval: 3000
-                        running: true
-                        repeat: true
-                        triggeredOnStart: true
-                        onTriggered: {
-                            // Update resource metrics
-                        }
+                    MouseArea {
+                        id: statsMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Process.exec(["plasma-systemmonitor"])
                     }
                 }
 
-                // 6. Volume Control Pill (Interactive Scroll & Click)
+                // 6. Volume Control (Scroll up/down for volume, click to mute)
                 Rectangle {
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.preferredWidth: volRow.implicitWidth + 12
-                    radius: 8
-                    color: volHover.hovered ? "#35313244" : "#2011111b"
+                    radius: 7
+                    color: volMouse.containsMouse ? "#35313244" : "#2511111b"
                     border.color: "#30fab387"
                     border.width: 1
 
@@ -354,40 +363,43 @@ ShellRoot {
                         spacing: 4
 
                         Text {
+                            anchors.verticalCenter: parent.verticalCenter
                             text: "󰕾"
                             font.pixelSize: 13
                             color: "#fab387"
                         }
                         Text {
-                            id: volText
-                            text: "100%"
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "VOL"
                             font.pixelSize: 11
                             font.family: "JetBrainsMono Nerd Font"
                             color: "#cdd6f4"
                         }
                     }
 
-                    HoverHandler { id: volHover }
-                    WheelHandler {
-                        onWheel: (event) => {
-                            if (event.angleDelta.y > 0) {
+                    MouseArea {
+                        id: volMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onWheel: (wheel) => {
+                            if (wheel.angleDelta.y > 0) {
                                 Process.exec(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+"]);
                             } else {
                                 Process.exec(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"]);
                             }
                         }
-                    }
-                    TapHandler {
-                        onTapped: Process.exec(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                        onClicked: Process.exec(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
                     }
                 }
 
-                // 7. Battery Indicator Pill
+                // 7. Battery Indicator
                 Rectangle {
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.preferredWidth: batRow.implicitWidth + 12
-                    radius: 8
-                    color: "#2011111b"
+                    radius: 7
+                    color: "#2511111b"
                     border.color: "#30a6e3a1"
                     border.width: 1
 
@@ -397,13 +409,14 @@ ShellRoot {
                         spacing: 4
 
                         Text {
+                            anchors.verticalCenter: parent.verticalCenter
                             text: "󰁹"
                             font.pixelSize: 13
                             color: "#a6e3a1"
                         }
                         Text {
-                            id: batText
-                            text: "85%"
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "BAT"
                             font.pixelSize: 11
                             font.family: "JetBrainsMono Nerd Font"
                             color: "#cdd6f4"
@@ -411,12 +424,13 @@ ShellRoot {
                     }
                 }
 
-                // 8. Action Controls (Terminal, Browser, Screenshot, Lock)
+                // 8. Action Launchers (Kitty, Zen, Screenshot, Lock)
                 Rectangle {
-                    Layout.preferredHeight: 28
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 26
                     Layout.preferredWidth: actRow.implicitWidth + 12
-                    radius: 8
-                    color: "#2011111b"
+                    radius: 7
+                    color: "#2511111b"
                     border.color: "#30cba6f7"
                     border.width: 1
 
@@ -427,66 +441,86 @@ ShellRoot {
 
                         // Terminal
                         Rectangle {
-                            width: 22
-                            height: 22
+                            width: 20
+                            height: 20
                             radius: 5
-                            color: tHover.hovered ? "#4089b4fa" : "transparent"
+                            color: tMouse.containsMouse ? "#4089b4fa" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: ""
                                 font.pixelSize: 12
                                 color: "#89b4fa"
                             }
-                            HoverHandler { id: tHover }
-                            TapHandler { onTapped: Process.exec(["kitty"]) }
+                            MouseArea {
+                                id: tMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["kitty"])
+                            }
                         }
 
                         // Browser
                         Rectangle {
-                            width: 22
-                            height: 22
+                            width: 20
+                            height: 20
                             radius: 5
-                            color: bHover.hovered ? "#40fab387" : "transparent"
+                            color: bMouse.containsMouse ? "#40fab387" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰈹"
                                 font.pixelSize: 12
                                 color: "#fab387"
                             }
-                            HoverHandler { id: bHover }
-                            TapHandler { onTapped: Process.exec(["zen-beta"]) }
+                            MouseArea {
+                                id: bMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["zen-beta"])
+                            }
                         }
 
-                        // Screenshot
+                        // Screenshot Spectacle
                         Rectangle {
-                            width: 22
-                            height: 22
+                            width: 20
+                            height: 20
                             radius: 5
-                            color: sHover.hovered ? "#40a6e3a1" : "transparent"
+                            color: sMouse.containsMouse ? "#40a6e3a1" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰹑"
                                 font.pixelSize: 12
                                 color: "#a6e3a1"
                             }
-                            HoverHandler { id: sHover }
-                            TapHandler { onTapped: Process.exec(["spectacle", "-r"]) }
+                            MouseArea {
+                                id: sMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["spectacle", "-r"])
+                            }
                         }
 
                         // Lock Screen
                         Rectangle {
-                            width: 22
-                            height: 22
+                            width: 20
+                            height: 20
                             radius: 5
-                            color: lHover.hovered ? "#40f38ba8" : "transparent"
+                            color: lMouse.containsMouse ? "#40f38ba8" : "transparent"
                             Text {
                                 anchors.centerIn: parent
                                 text: "󰌾"
                                 font.pixelSize: 12
                                 color: "#f38ba8"
                             }
-                            HoverHandler { id: lHover }
-                            TapHandler { onTapped: Process.exec(["loginctl", "lock-session"]) }
+                            MouseArea {
+                                id: lMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Process.exec(["loginctl", "lock-session"])
+                            }
                         }
                     }
                 }
