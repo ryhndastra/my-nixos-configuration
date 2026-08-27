@@ -83,7 +83,7 @@ ShellRoot {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Process.exec(["qdbus", "org.kde.krunner", "/App", "display"])
+                        onClicked: Quickshell.execDetached(["qdbus", "org.kde.krunner", "/App", "display"])
                     }
                 }
 
@@ -126,7 +126,7 @@ ShellRoot {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: Process.exec(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
+                                    onClicked: Quickshell.execDetached(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", modelData])
                                 }
                             }
                         }
@@ -181,7 +181,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["playerctl", "previous"])
+                                onClicked: Quickshell.execDetached(["playerctl", "previous"])
                             }
                         }
 
@@ -196,7 +196,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["playerctl", "play-pause"])
+                                onClicked: Quickshell.execDetached(["playerctl", "play-pause"])
                             }
                         }
 
@@ -211,7 +211,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["playerctl", "next"])
+                                onClicked: Quickshell.execDetached(["playerctl", "next"])
                             }
                         }
                     }
@@ -278,7 +278,7 @@ ShellRoot {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Process.exec(["plasma-systemmonitor"])
+                        onClicked: Quickshell.execDetached(["plasma-systemmonitor"])
                     }
                 }
 
@@ -343,7 +343,7 @@ ShellRoot {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Process.exec(["plasma-systemmonitor"])
+                        onClicked: Quickshell.execDetached(["plasma-systemmonitor"])
                     }
                 }
 
@@ -384,12 +384,12 @@ ShellRoot {
                         cursorShape: Qt.PointingHandCursor
                         onWheel: (wheel) => {
                             if (wheel.angleDelta.y > 0) {
-                                Process.exec(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+"]);
+                                Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+"]);
                             } else {
-                                Process.exec(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"]);
+                                Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"]);
                             }
                         }
-                        onClicked: Process.exec(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                        onClicked: Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
                     }
                 }
 
@@ -456,7 +456,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["kitty"])
+                                onClicked: Quickshell.execDetached(["kitty"])
                             }
                         }
 
@@ -477,7 +477,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["zen-beta"])
+                                onClicked: Quickshell.execDetached(["zen-beta"])
                             }
                         }
 
@@ -498,7 +498,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["spectacle", "-r"])
+                                onClicked: Quickshell.execDetached(["spectacle", "-r"])
                             }
                         }
 
@@ -519,7 +519,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["loginctl", "lock-session"])
+                                onClicked: Quickshell.execDetached(["loginctl", "lock-session"])
                             }
                         }
 
@@ -540,7 +540,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Process.exec(["qdbus", "org.kde.Shutdown", "/Shutdown", "logoutAndPrompt"])
+                                onClicked: Quickshell.execDetached(["qdbus", "org.kde.Shutdown", "/Shutdown", "logoutAndPrompt"])
                             }
                         }
                     }
