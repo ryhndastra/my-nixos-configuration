@@ -197,11 +197,16 @@ in
     };
 
     configFile = {
-      # Disable Auto-Tilers & Raw Translucency to prevent resizing locks and flickering
+      # KWin GPU Frosted Glass Blur & Window Translucency (Frosted Glass on all Apps)
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."poloniumEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
-      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = false;
+      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = true;
+      "kwinrc"."Effect-translucency"."ActiveWindow" = 88;
+      "kwinrc"."Effect-translucency"."InactiveWindow" = 78;
+      "kwinrc"."Effect-translucency"."Dialogs" = 85;
+      "kwinrc"."Effect-translucency"."Menus" = 85;
+      "kwinrc"."Effect-translucency"."MoveResize" = 75;
 
       # KWin Plasma 6 Native Quick Tiling & 10px Window Gaps
       "kwinrc"."Tiling"."padding" = 10;
