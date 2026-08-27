@@ -48,19 +48,6 @@ in
     x11.enable = true;
   };
 
-  gtk = {
-    enable = true;
-    cursorTheme = {
-      package = aospCursors;
-      name = "aosp-cursors";
-      size = 16;
-    };
-    iconTheme = {
-      package = pkgs.papirus-icon-theme;
-      name = "Papirus-Dark";
-    };
-  };
-
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       cursor-theme = "aosp-cursors";
