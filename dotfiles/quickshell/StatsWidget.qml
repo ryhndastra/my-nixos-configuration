@@ -1,12 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 
-// System Stats Widget — shows realtime RAM and CPU usage
-// Click to open stats dropdown
+// System Stats Widget — shows realtime RAM% and CPU% 
 Item {
     id: root
     property int cpuPercent: 0
-    property string ramText: "--"
+    property int ramPercent: 0
     property bool isOpen: false
     signal clicked()
 
@@ -26,52 +25,37 @@ Item {
             anchors.centerIn: parent
             spacing: 8
 
-            // RAM
+            // RAM %
             Row {
-                spacing: 3
-                anchors.verticalCenter: parent.verticalCenter
+                spacing: 3; anchors.verticalCenter: parent.verticalCenter
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "󰍛"
-                    font.pixelSize: 12
-                    color: "#89dceb"
+                    text: "󰍛"; font.pixelSize: 12; color: "#89dceb"
                 }
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: root.ramText
-                    font.pixelSize: 11
-                    font.family: "JetBrainsMono Nerd Font"
-                    color: "#cdd6f4"
+                    text: root.ramPercent + "%"
+                    font.pixelSize: 11; font.family: "JetBrainsMono Nerd Font"; color: "#cdd6f4"
                 }
             }
 
-            // CPU
+            // CPU %
             Row {
-                spacing: 3
-                anchors.verticalCenter: parent.verticalCenter
+                spacing: 3; anchors.verticalCenter: parent.verticalCenter
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "󰻠"
-                    font.pixelSize: 12
+                    text: "󰻠"; font.pixelSize: 12
                     color: root.cpuPercent > 80 ? "#f38ba8" : root.cpuPercent > 50 ? "#f9e2af" : "#a6e3a1"
                     Behavior on color { ColorAnimation { duration: 300 } }
                 }
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.cpuPercent + "%"
-                    font.pixelSize: 11
-                    font.family: "JetBrainsMono Nerd Font"
-                    color: "#cdd6f4"
+                    font.pixelSize: 11; font.family: "JetBrainsMono Nerd Font"; color: "#cdd6f4"
                 }
             }
         }
 
-        MouseArea {
-            id: ma
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: root.clicked()
-        }
+        MouseArea { id: ma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.clicked() }
     }
 }
