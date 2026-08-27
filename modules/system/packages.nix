@@ -50,6 +50,9 @@
 
     # KDE Plasma Utilities & Aesthetic Tools
     catppuccin-kde
+    catppuccin-papirus-folders
+    kde-rounded-corners
+    plasma-panel-colorizer
     papirus-icon-theme
     kdePackages.plasma-systemmonitor
     kdePackages.spectacle

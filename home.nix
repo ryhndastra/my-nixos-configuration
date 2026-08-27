@@ -89,6 +89,33 @@ in
       wallpaper = sakuraWallpaper;
     };
 
+    fonts = {
+      general = {
+        family = "Noto Sans CJK JP";
+        pointSize = 10;
+      };
+      fixedWidth = {
+        family = "JetBrainsMono Nerd Font";
+        pointSize = 10;
+      };
+      small = {
+        family = "Noto Sans CJK JP";
+        pointSize = 8;
+      };
+      toolbar = {
+        family = "Noto Sans CJK JP";
+        pointSize = 10;
+      };
+      menu = {
+        family = "Noto Sans CJK JP";
+        pointSize = 10;
+      };
+      windowTitle = {
+        family = "Noto Sans CJK JP";
+        pointSize = 10;
+      };
+    };
+
     # Matching SDDM Pixel Sakura Lockscreen
     kscreenlocker = {
       appearance = {
@@ -104,7 +131,7 @@ in
       effects = {
         blur = {
           enable = true;
-          noiseStrength = 4;
+          noiseStrength = 5;
         };
         translucency.enable = true;
         wobblyWindows.enable = false;
@@ -177,7 +204,7 @@ in
             config = {
               Appearance = {
                 showSeconds = "never";
-                customDateFormat = "ddd, d MMM";
+                customDateFormat = "MM月dd日 (ddd)";
                 dateFormat = "custom";
                 use24hFormat = 2;
               };
@@ -226,18 +253,18 @@ in
       "kwin"."Window Grow Vertical" = "Meta+Ctrl+Up";
       "kwin"."Window Shrink Vertical" = "Meta+Ctrl+Down";
 
-      # Workspaces Navigation
+      # Workspaces Navigation & Window Moving (Win+Number & Win+Shift+Number)
       "kwin"."Switch to Desktop 1" = "Meta+1";
       "kwin"."Switch to Desktop 2" = "Meta+2";
       "kwin"."Switch to Desktop 3" = "Meta+3";
       "kwin"."Switch to Desktop 4" = "Meta+4";
       "kwin"."Switch to Desktop 5" = "Meta+5";
 
-      "kwin"."Window to Desktop 1" = "Meta+Shift+!";
-      "kwin"."Window to Desktop 2" = "Meta+Shift+@";
-      "kwin"."Window to Desktop 3" = "Meta+Shift+#";
-      "kwin"."Window to Desktop 4" = "Meta+Shift+$";
-      "kwin"."Window to Desktop 5" = "Meta+Shift+%";
+      "kwin"."Window to Desktop 1" = "Meta+Shift+1";
+      "kwin"."Window to Desktop 2" = "Meta+Shift+2";
+      "kwin"."Window to Desktop 3" = "Meta+Shift+3";
+      "kwin"."Window to Desktop 4" = "Meta+Shift+4";
+      "kwin"."Window to Desktop 5" = "Meta+Shift+5";
 
       # Lock screen (matching Niri Meta+Alt+L)
       "ksmserver"."Lock Session" = "Meta+Alt+L";
@@ -248,6 +275,22 @@ in
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
+
+      # Native KWin Smooth Rounded Corners Shader (14px radius + Sakura Outline Border)
+      "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
+      "kwinrc"."Effect-shapecorners"."RoundCorners" = true;
+      "kwinrc"."Effect-shapecorners"."CornerRadius" = 14;
+      "kwinrc"."Effect-shapecorners"."Outline" = true;
+      "kwinrc"."Effect-shapecorners"."OutlineThickness" = 1.5;
+      "kwinrc"."Effect-shapecorners"."OutlineColor" = "203,166,247,190";
+      "kwinrc"."Effect-shapecorners"."Shadow" = true;
+      "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
+
+      # Sleek Modern Window Decorations (Clean minimal borders)
+      "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
+      "kwinrc"."org.kde.kdecoration2"."BorderSizeAuto" = false;
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
 
       # Mouse on Focus (Focus Follows Mouse)
       "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
