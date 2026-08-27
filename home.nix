@@ -218,6 +218,12 @@ in
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
+      # Window Resize (Niri / Hyprland Style)
+      "kwin"."Window Grow Horizontal" = "Meta+Ctrl+Right";
+      "kwin"."Window Shrink Horizontal" = "Meta+Ctrl+Left";
+      "kwin"."Window Grow Vertical" = "Meta+Ctrl+Up";
+      "kwin"."Window Shrink Vertical" = "Meta+Ctrl+Down";
+
       # Workspaces Navigation
       "kwin"."Switch to Desktop 1" = "Meta+1";
       "kwin"."Switch to Desktop 2" = "Meta+2";
@@ -240,6 +246,10 @@ in
       "kwinrc"."ModifierOnlyShortcuts"."Meta" = "org.kde.plasma.kickoff,org.kde.plasma.kickoff,toggle";
       "kwinrc"."Plugins"."krohnkiteEnabled" = true;
       "kwinrc"."Windows"."BorderlessMaximizedWindows" = true;
+      "kwinrc"."Windows"."CommandAllKey" = "Meta";
+      "kwinrc"."Windows"."CommandAll1" = "Move";
+      "kwinrc"."Windows"."CommandAll2" = "Resize";
+      "kwinrc"."Windows"."CommandAll3" = "Maximize";
     };
   };
 
