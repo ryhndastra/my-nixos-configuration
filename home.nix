@@ -203,7 +203,8 @@ in
       "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
       # NOTE: kwin4_effect_translucency causes FLICKERING when combined with shapecorners shader.
       # Use per-app transparency instead (kitty background_opacity, etc.)
-      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = false;
+      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = lib.mkForce false;
+      "kwinrc"."Plugins"."translucencyEnabled" = lib.mkForce false;
       # Enable native GPU blur — makes transparent app backgrounds (kitty etc.) frosted
       "kwinrc"."Plugins"."blurEnabled" = true;
 

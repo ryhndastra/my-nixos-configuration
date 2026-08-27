@@ -13,12 +13,13 @@ ShellRoot {
 
     // ── Global State ──────────────────────────────────────────
     property int    activeDesktop:   1
-    property string openDropdown:    ""    // "clock"|"stats"|"volume"|"battery"|""
+    property string openDropdown:    ""    // "clock"|"stats"|"volume"|"battery"|"cc"|""
     property bool   powerMenuOpen:   false
     property real   clockWidgetX:    0
     property real   statsWidgetX:    0
     property real   volumeWidgetX:   0
     property real   batteryWidgetX:  0
+    property real   ccWidgetX:       0
 
     // ── Media / MPRIS ─────────────────────────────────────────
     property string playerName:   ""
@@ -132,13 +133,12 @@ ShellRoot {
     Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true
         onTriggered: if (!volProc.running) volProc.running = true }
 
-    // 5. MPRIS Media (every 2s) — with zombie detection
+    // 5. MPRIS Media (every 2s) — with active check
     Process {
         id: mediaProc
-        // First check if any player is ACTUALLY running and Playing/Paused
         command: ["sh", "-c",
-            "status=$(playerctl -a status 2>/dev/null | head -1);" +
-            "if [ -z \"$status\" ] || [ \"$status\" = 'Stopped' ]; then echo 'NONE'; exit 0; fi;" +
+            "status=$(playerctl -a status 2>/dev/null | grep -E 'Playing|Paused' | head -1);" +
+            "if [ -z \"$status\" ]; then echo 'NONE'; exit 0; fi;" +
             "playerctl -a metadata --format '{{playerName}}|||{{title}}|||{{artist}}|||{{status}}' 2>/dev/null | head -1"]
         stdout: SplitParser {
             onRead: function(line) {
@@ -150,8 +150,7 @@ ShellRoot {
                 var p = l.split("|||")
                 var pn = (p[0] || "").toLowerCase()
                 var status = (p[3] || "").trim()
-                // Only show if actually Playing or Paused — not Stopped
-                if (status === "Stopped" || status === "") {
+                if (status !== "Playing" && status !== "Paused") {
                     root.playerName = ""; root.trackTitle = ""; root.trackArtist = ""; root.isPlaying = false
                     return
                 }
@@ -162,9 +161,8 @@ ShellRoot {
                 // Dynamic icon
                 if      (pn.includes("spotify"))   root.playerIcon = "󰓇"
                 else if (pn.includes("zen") || pn.includes("firefox") || pn.includes("chrome") || pn.includes("brave")) root.playerIcon = "󰈹"
-                else if (pn.includes("mpv"))        root.playerIcon = "󰕼"
-                else if (pn.includes("vlc"))        root.playerIcon = "󰕼"
-                else                                root.playerIcon = "󰎆"
+                else if (pn.includes("mpv") || pn.includes("vlc"))        root.playerIcon = "󰕼"
+                else                                                      root.playerIcon = "󰎆"
             }
         }
     }
@@ -192,7 +190,7 @@ ShellRoot {
     Timer { interval: 5000; running: true; repeat: true; triggeredOnStart: true
         onTriggered: if (!brightProc.running) brightProc.running = true }
 
-    // 7. Network speed (every 2s, compute delta)
+    // 7. Network speed (every 2s)
     Process {
         id: netProc
         command: ["sh", "-c",
@@ -211,7 +209,7 @@ ShellRoot {
                 var tx = parseFloat(p[2]) || 0
                 var deltaRx = Math.max(0, rx - root.prevNetRxBytes)
                 var deltaTx = Math.max(0, tx - root.prevNetTxBytes)
-                var combined = (deltaRx + deltaTx) / 2  // bytes per 2s → per second
+                var combined = (deltaRx + deltaTx) / 2
                 if (root.prevNetRxBytes > 0) {
                     var kbps = combined / 1024
                     if (kbps > 1024) root.netSpeed = (Math.round(kbps / 102.4) / 10) + " MB/s"
@@ -237,15 +235,13 @@ ShellRoot {
         implicitHeight: barH + (root.openDropdown !== "" ? dropdownMaxH : 0)
         color: "transparent"
 
-        // !! Critical: lock exclusive zone to bar height only
-        // so dropdowns don't push windows down
         WlrLayershell.layer:         WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace:     "quickshell-bar"
         WlrLayershell.exclusiveZone: barH
 
         readonly property int barH:        44
-        readonly property int dropdownMaxH: 300
+        readonly property int dropdownMaxH: 480
 
         // Dismiss overlay — click below bar to close any dropdown
         MouseArea {
@@ -261,7 +257,7 @@ ShellRoot {
             anchors { top: parent.top; topMargin: 5; left: parent.left; leftMargin: 10; right: parent.right; rightMargin: 10 }
             height: 34
             radius: 12
-            color: "#cc181825"    // ~80% opaque — solid enough to read
+            color: "#d0181825"
             border.color: "#95cba6f7"
             border.width: 1.5
             z: 10
@@ -269,7 +265,7 @@ ShellRoot {
             // Top specular sheen
             Rectangle {
                 anchors { top: parent.top; topMargin: 1; left: parent.left; leftMargin: 16; right: parent.right; rightMargin: 16 }
-                height: 1; color: "#40ffffff"; radius: 1
+                height: 1; color: "#45ffffff"; radius: 1
             }
 
             RowLayout {
@@ -293,12 +289,19 @@ ShellRoot {
                     }
                 }
 
+                // Workspace pills
                 WorkspaceWidget {
                     Layout.alignment: Qt.AlignVCenter
                     activeDesktop: root.activeDesktop
                     onDesktopClicked: (d) => Quickshell.execDetached(["qdbus", "org.kde.KWin", "/KWin", "setCurrentDesktop", "" + d])
                 }
 
+                // Running & Minimized Apps Taskbar
+                TaskbarWidget {
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                // Media player
                 MediaWidget {
                     id: mediaW
                     Layout.alignment: Qt.AlignVCenter
@@ -318,7 +321,8 @@ ShellRoot {
                     Layout.alignment: Qt.AlignVCenter
                     isOpen: root.openDropdown === "clock"
                     onClicked: {
-                        root.clockWidgetX = clockW.mapToItem(barWindow, 0, 0).x + clockW.width / 2 - 130
+                        var p = clockW.mapToItem(barCapsule, 0, 0)
+                        root.clockWidgetX = barCapsule.x + p.x + clockW.width / 2 - 143
                         root.openDropdown = root.openDropdown === "clock" ? "" : "clock"
                     }
                 }
@@ -326,9 +330,24 @@ ShellRoot {
                 Item { Layout.fillWidth: true }
 
                 // ── RIGHT ─────────────────────────────────────
-                NetworkWidget {
+
+                // System Tray (Vesktop, Steam, etc.)
+                TrayWidget {
                     Layout.alignment: Qt.AlignVCenter
-                    netType: root.netType; netSpeed: root.netSpeed; netSSID: root.netSSID
+                }
+
+                // Noctalia Master Control Center Pill
+                ControlCenterWidget {
+                    id: ccW
+                    Layout.alignment: Qt.AlignVCenter
+                    volumePercent: root.volumePercent; volumeMuted: root.volumeMuted
+                    batteryPercent: root.batteryPercent; batteryCharging: root.batteryCharging
+                    netType: root.netType; isOpen: root.openDropdown === "cc"
+                    onClicked: {
+                        var p = ccW.mapToItem(barCapsule, 0, 0)
+                        root.ccWidgetX = barCapsule.x + p.x + ccW.width / 2 - 180
+                        root.openDropdown = root.openDropdown === "cc" ? "" : "cc"
+                    }
                 }
 
                 BrightnessWidget {
@@ -348,7 +367,8 @@ ShellRoot {
                     cpuPercent: root.cpuPercent; ramPercent: root.ramPercent
                     isOpen: root.openDropdown === "stats"
                     onClicked: {
-                        root.statsWidgetX = statsW.mapToItem(barWindow, 0, 0).x + statsW.width / 2 - 120
+                        var p = statsW.mapToItem(barCapsule, 0, 0)
+                        root.statsWidgetX = barCapsule.x + p.x + statsW.width / 2 - 130
                         root.openDropdown = root.openDropdown === "stats" ? "" : "stats"
                     }
                 }
@@ -363,7 +383,8 @@ ShellRoot {
                         if (!volProc.running) volProc.running = true
                     }
                     onClicked: {
-                        root.volumeWidgetX = volumeW.mapToItem(barWindow, 0, 0).x + volumeW.width / 2 - 110
+                        var p = volumeW.mapToItem(barCapsule, 0, 0)
+                        root.volumeWidgetX = barCapsule.x + p.x + volumeW.width / 2 - 120
                         root.openDropdown = root.openDropdown === "volume" ? "" : "volume"
                     }
                 }
@@ -374,7 +395,8 @@ ShellRoot {
                     batteryPercent: root.batteryPercent; charging: root.batteryCharging
                     isOpen: root.openDropdown === "battery"
                     onClicked: {
-                        root.batteryWidgetX = batteryW.mapToItem(barWindow, 0, 0).x + batteryW.width / 2 - 100
+                        var p = batteryW.mapToItem(barCapsule, 0, 0)
+                        root.batteryWidgetX = barCapsule.x + p.x + batteryW.width / 2 - 120
                         root.openDropdown = root.openDropdown === "battery" ? "" : "battery"
                     }
                 }
@@ -385,7 +407,7 @@ ShellRoot {
                     onLaunchBrowser:  Quickshell.execDetached(["zen-beta"])
                     onScreenshot:     Quickshell.execDetached(["spectacle", "-r"])
                     onLockScreen:     Quickshell.execDetached(["loginctl", "lock-session"])
-                    onPowerMenu:      root.powerMenuOpen = true
+                    onPowerMenu:      root.powerMenuOpen = !root.powerMenuOpen
                 }
             }
         }
@@ -394,7 +416,7 @@ ShellRoot {
 
         CalendarDropdown {
             visible: root.openDropdown === "clock"
-            x: Math.max(8, Math.min(root.clockWidgetX, barWindow.width - width - 8))
+            x: Math.max(10, Math.min(root.clockWidgetX, barWindow.width - width - 10))
             anchors { top: barCapsule.bottom; topMargin: 6 }
             z: 20
             opacity: visible ? 1 : 0
@@ -403,7 +425,7 @@ ShellRoot {
 
         StatsDropdown {
             visible: root.openDropdown === "stats"
-            x: Math.max(8, Math.min(root.statsWidgetX, barWindow.width - width - 8))
+            x: Math.max(10, Math.min(root.statsWidgetX, barWindow.width - width - 10))
             anchors { top: barCapsule.bottom; topMargin: 6 }
             cpuPercent: root.cpuPercent; ramPercent: root.ramPercent; ramDetail: root.ramDetail
             z: 20
@@ -413,7 +435,7 @@ ShellRoot {
 
         VolumeDropdown {
             visible: root.openDropdown === "volume"
-            x: Math.max(8, Math.min(root.volumeWidgetX, barWindow.width - width - 8))
+            x: Math.max(10, Math.min(root.volumeWidgetX, barWindow.width - width - 10))
             anchors { top: barCapsule.bottom; topMargin: 6 }
             volumePercent: root.volumePercent; muted: root.volumeMuted
             onVolumeChange: (pct) => {
@@ -431,9 +453,45 @@ ShellRoot {
 
         BatteryDropdown {
             visible: root.openDropdown === "battery"
-            x: Math.max(8, Math.min(root.batteryWidgetX, barWindow.width - width - 8))
+            x: Math.max(10, Math.min(root.batteryWidgetX, barWindow.width - width - 10))
             anchors { top: barCapsule.bottom; topMargin: 6 }
             batteryPercent: root.batteryPercent; charging: root.batteryCharging
+            z: 20
+            opacity: visible ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+        }
+
+        // Master Control Center Dropdown
+        ControlCenterDropdown {
+            visible: root.openDropdown === "cc"
+            x: Math.max(10, Math.min(root.ccWidgetX, barWindow.width - width - 10))
+            anchors { top: barCapsule.bottom; topMargin: 6 }
+            volumePercent: root.volumePercent; muted: root.volumeMuted
+            brightnessPercent: root.brightnessPercent
+            cpuPercent: root.cpuPercent; ramPercent: root.ramPercent; ramDetail: root.ramDetail
+            batteryPercent: root.batteryPercent; batteryCharging: root.batteryCharging
+            netType: root.netType; netSpeed: root.netSpeed; netSSID: root.netSSID
+            playerName: root.playerName; playerIcon: root.playerIcon
+            trackTitle: root.trackTitle; trackArtist: root.trackArtist; isPlaying: root.isPlaying
+            onVolumeChange: (pct) => {
+                Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (pct / 100).toFixed(2)])
+                if (!volProc.running) volProc.running = true
+            }
+            onMuteToggle: {
+                Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                if (!volProc.running) volProc.running = true
+            }
+            onBrightnessChange: (pct) => {
+                Quickshell.execDetached(["brightnessctl", "set", pct + "%"])
+                if (!brightProc.running) brightProc.running = true
+            }
+            onPrevTrack:      Quickshell.execDetached(["playerctl", "previous"])
+            onPlayPauseTrack: Quickshell.execDetached(["playerctl", "play-pause"])
+            onNextTrack:      Quickshell.execDetached(["playerctl", "next"])
+            onOpenPowerMenu: {
+                root.openDropdown = ""
+                root.powerMenuOpen = true
+            }
             z: 20
             opacity: visible ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
@@ -441,7 +499,7 @@ ShellRoot {
     }
 
     // ─────────────────────────────────────────────────────────
-    // POWER MENU — full screen overlay, dismissable
+    // POWER MENU — full screen overlay with luxury aesthetic
     // ─────────────────────────────────────────────────────────
     PanelWindow {
         id: pwrWindow
@@ -456,60 +514,78 @@ ShellRoot {
         // Dark backdrop — click to dismiss
         Rectangle {
             anchors.fill: parent
-            color: "#b0000000"
+            color: "#c0000000"
             MouseArea { anchors.fill: parent; onClicked: root.powerMenuOpen = false }
         }
 
         // Power card (centered)
         Rectangle {
             anchors.centerIn: parent
-            width: 420; height: 180
-            radius: 18
-            color: "#f0181825"
-            border.color: "#80cba6f7"; border.width: 1.5
+            width: 480; height: 230
+            radius: 20
+            color: "#f2181825"
+            border.color: "#90cba6f7"; border.width: 1.5
 
             // Top sheen
             Rectangle {
-                anchors { top: parent.top; topMargin: 1; left: parent.left; leftMargin: 18; right: parent.right; rightMargin: 18 }
-                height: 1; color: "#40ffffff"; radius: 1
+                anchors { top: parent.top; topMargin: 1; left: parent.left; leftMargin: 20; right: parent.right; rightMargin: 20 }
+                height: 1; color: "#50ffffff"; radius: 1
             }
 
-            Column {
-                anchors.top: parent.top; anchors.topMargin: 16; anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 4
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 18
+                spacing: 12
 
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "電源管理"   // "Power Management" in Japanese
-                    font.pixelSize: 13; font.bold: true; color: "#a6adc8"
-                    font.family: "Noto Sans CJK JP"
+                // Header
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text { text: "🌸"; font.pixelSize: 18 }
+                    ColumnLayout {
+                        spacing: 1
+                        Text { text: "電源メニュー • Power Menu"; font.pixelSize: 14; font.bold: true; font.family: "Noto Sans CJK JP"; color: "#cdd6f4" }
+                        Text { text: "システム操作を選択してください"; font.pixelSize: 9; font.family: "Noto Sans CJK JP"; color: "#6c7086" }
+                    }
+                    Item { Layout.fillWidth: true }
+                    // Close button
+                    Rectangle {
+                        width: 26; height: 26; radius: 13
+                        color: closeMa.containsMouse ? "#30f38ba8" : "#20313244"
+                        border.color: closeMa.containsMouse ? "#f38ba8" : "#3045475a"; border.width: 1
+                        Text { anchors.centerIn: parent; text: "✕"; font.pixelSize: 11; color: "#cdd6f4" }
+                        MouseArea {
+                            id: closeMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: root.powerMenuOpen = false
+                        }
+                    }
                 }
 
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 12
+                // 5 Power Buttons
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
 
                     Repeater {
                         model: [
-                            { icon: "󰐥", label: "シャット\nダウン", cmd: ["systemctl", "poweroff"],   color: "#f38ba8" },
-                            { icon: "󰜉", label: "再起動",   cmd: ["systemctl", "reboot"],      color: "#fab387" },
-                            { icon: "󰤄", label: "スリープ", cmd: ["systemctl", "suspend"],      color: "#89b4fa" },
-                            { icon: "󰒲", label: "ハイバネ", cmd: ["systemctl", "hibernate"],    color: "#cba6f7" },
-                            { icon: "󰌾", label: "ロック",   cmd: ["loginctl", "lock-session"], color: "#a6e3a1" }
+                            { icon: "󰐥", label: "シャット\nダウン", sub: "Power Off",  cmd: ["systemctl", "poweroff"],   color: "#f38ba8" },
+                            { icon: "󰜉", label: "再起動",       sub: "Reboot",     cmd: ["systemctl", "reboot"],      color: "#fab387" },
+                            { icon: "󰤄", label: "サスペンド",   sub: "Suspend",    cmd: ["systemctl", "suspend"],      color: "#89b4fa" },
+                            { icon: "󰒲", label: "休止状態",     sub: "Hibernate",  cmd: ["systemctl", "hibernate"],    color: "#cba6f7" },
+                            { icon: "󰌾", label: "画面ロック",   sub: "Lock",       cmd: ["loginctl", "lock-session"], color: "#a6e3a1" }
                         ]
                         Rectangle {
-                            width: 68; height: 96; radius: 12
+                            Layout.fillWidth: true; height: 104; radius: 14
                             color: pwrBtnMa.containsMouse ? Qt.rgba(
                                 parseInt(modelData.color.slice(1,3),16)/255,
                                 parseInt(modelData.color.slice(3,5),16)/255,
-                                parseInt(modelData.color.slice(5,7),16)/255, 0.2) : "#20313244"
-                            border.color: pwrBtnMa.containsMouse ? modelData.color : "#30313244"
-                            border.width: 1.5
+                                parseInt(modelData.color.slice(5,7),16)/255, 0.22) : "#1c313244"
+                            border.color: pwrBtnMa.containsMouse ? modelData.color : "#3045475a"
+                            border.width: pwrBtnMa.containsMouse ? 2 : 1
                             Behavior on color { ColorAnimation { duration: 100 } }
 
                             Column {
                                 anchors.centerIn: parent
-                                spacing: 6
+                                spacing: 4
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: modelData.icon; font.pixelSize: 26; color: modelData.color
@@ -517,8 +593,13 @@ ShellRoot {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: modelData.label
-                                    font.pixelSize: 9; font.family: "Noto Sans CJK JP"
+                                    font.pixelSize: 10; font.bold: true; font.family: "Noto Sans CJK JP"
                                     color: "#cdd6f4"; horizontalAlignment: Text.AlignHCenter
+                                }
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: modelData.sub
+                                    font.pixelSize: 8; color: "#6c7086"
                                 }
                             }
 
@@ -531,6 +612,23 @@ ShellRoot {
                                 }
                             }
                         }
+                    }
+                }
+
+                // Cancel button
+                Rectangle {
+                    Layout.alignment: Qt.AlignHCenter
+                    width: 140; height: 28; radius: 8
+                    color: cancelMa.containsMouse ? "#30cba6f7" : "#18313244"
+                    border.color: cancelMa.containsMouse ? "#cba6f7" : "#3045475a"; border.width: 1
+                    Text {
+                        anchors.centerIn: parent
+                        text: "キャンセル • Cancel"
+                        font.pixelSize: 10; font.family: "Noto Sans CJK JP"; color: "#a6adc8"
+                    }
+                    MouseArea {
+                        id: cancelMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: root.powerMenuOpen = false
                     }
                 }
             }
