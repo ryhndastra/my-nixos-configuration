@@ -48,12 +48,8 @@
     vscode
     cloudflared
 
-    # KDE Plasma Utilities & Aesthetic Tools
-    catppuccin-kde
-    kde-rounded-corners
-    plasma-panel-colorizer
+    # KDE Plasma Utilities
     papirus-icon-theme
-    quickshell
     kdePackages.plasma-systemmonitor
     kdePackages.spectacle
     kdePackages.dolphin

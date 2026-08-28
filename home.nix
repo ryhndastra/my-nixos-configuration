@@ -60,7 +60,7 @@ in
     "Xcursor.theme" = "aosp-cursors";
   };
 
-  # Declarative KDE Plasma 6 Ricing (Japanese Aesthetic + Hyprland/Niri Style)
+  # Pure Standard KDE Plasma 6 Configuration
   programs.plasma = {
     enable = true;
 
@@ -103,7 +103,6 @@ in
       };
     };
 
-    # Matching SDDM Pixel Sakura Lockscreen
     kscreenlocker = {
       appearance = {
         alwaysShowClock = true;
@@ -116,26 +115,60 @@ in
 
     kwin = {
       effects = {
-        blur = {
-          enable = true;
-          noiseStrength = 5;
-        };
+        blur.enable = true;
         translucency.enable = true;
         wobblyWindows.enable = false;
       };
-      nightLight = {
-        enable = false;
-      };
+      nightLight.enable = false;
       virtualDesktops = {
         number = 5;
         rows = 1;
       };
     };
 
-    # Panels handled exclusively by Quickshell floating translucent bar
-    panels = [];
+    # Standard Native KDE Plasma 6 Floating Panel
+    panels = [
+      {
+        location = "bottom";
+        height = 44;
+        floating = true;
+        widgets = [
+          {
+            name = "org.kde.plasma.kickoff";
+            config = {
+              General = {
+                icon = "nix-snowflake";
+              };
+            };
+          }
+          {
+            name = "org.kde.plasma.pager";
+          }
+          {
+            name = "org.kde.plasma.icontasks";
+            config = {
+              General = {
+                launchers = [
+                  "applications:kitty.desktop"
+                  "applications:zen-beta.desktop"
+                  "applications:org.gnome.Nautilus.desktop"
+                  "applications:code.desktop"
+                  "applications:spotify.desktop"
+                ];
+              };
+            };
+          }
+          {
+            name = "org.kde.plasma.systemtray";
+          }
+          {
+            name = "org.kde.plasma.digitalclock";
+          }
+        ];
+      }
+    ];
 
-    # Keybindings (Single Super for Launcher + Niri/Hyprland Shortcuts + Quick Tiling)
+    # Standard Clean Shortcuts
     shortcuts = {
       # Applications
       "services/kitty.desktop"."_launch" = "Meta+T";
@@ -160,146 +193,41 @@ in
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
-      # KWin Tile Layout Editor (Super + Shift + T)
-      "kwin"."Edit Tiles" = "Meta+Shift+T";
-
-      # Quick Tiling (Native KWin Tile Snapping with 10px Gaps)
+      # Quick Tiling (Native KWin Tile Snapping)
       "kwin"."Window Quick Tile Left" = "Meta+Left";
       "kwin"."Window Quick Tile Right" = "Meta+Right";
       "kwin"."Window Quick Tile Top" = "Meta+Up";
       "kwin"."Window Quick Tile Bottom" = "Meta+Down";
-      "kwin"."Window Quick Tile Top Left" = "Meta+Shift+Left";
-      "kwin"."Window Quick Tile Top Right" = "Meta+Shift+Right";
-      "kwin"."Window Quick Tile Bottom Left" = "Meta+Shift+Down";
-      "kwin"."Window Quick Tile Bottom Right" = "Meta+Shift+Up";
 
-      # Window Resize via Keyboard
-      "kwin"."Window Grow Horizontal" = "Meta+Ctrl+Right";
-      "kwin"."Window Shrink Horizontal" = "Meta+Ctrl+Left";
-      "kwin"."Window Grow Vertical" = "Meta+Ctrl+Up";
-      "kwin"."Window Shrink Vertical" = "Meta+Ctrl+Down";
-
-      # Workspaces Navigation & Window Moving (Win+Number & Win+Shift+Number 1-9)
+      # Workspaces Navigation & Window Moving
       "kwin"."Switch to Desktop 1" = "Meta+1";
       "kwin"."Switch to Desktop 2" = "Meta+2";
       "kwin"."Switch to Desktop 3" = "Meta+3";
       "kwin"."Switch to Desktop 4" = "Meta+4";
       "kwin"."Switch to Desktop 5" = "Meta+5";
-      "kwin"."Switch to Desktop 6" = "Meta+6";
-      "kwin"."Switch to Desktop 7" = "Meta+7";
-      "kwin"."Switch to Desktop 8" = "Meta+8";
-      "kwin"."Switch to Desktop 9" = "Meta+9";
 
       "kwin"."Window to Desktop 1" = "Meta+Shift+1\tMeta+!";
       "kwin"."Window to Desktop 2" = "Meta+Shift+2\tMeta+@";
       "kwin"."Window to Desktop 3" = "Meta+Shift+3\tMeta+#";
       "kwin"."Window to Desktop 4" = "Meta+Shift+4\tMeta+$";
       "kwin"."Window to Desktop 5" = "Meta+Shift+5\tMeta+%";
-      "kwin"."Window to Desktop 6" = "Meta+Shift+6\tMeta+^";
-      "kwin"."Window to Desktop 7" = "Meta+Shift+7\tMeta+&";
-      "kwin"."Window to Desktop 8" = "Meta+Shift+8\tMeta+*";
-      "kwin"."Window to Desktop 9" = "Meta+Shift+9\tMeta+(";
 
-      # Lock screen (matching Niri Meta+Alt+L)
+      # Lock screen
       "ksmserver"."Lock Session" = "Meta+Alt+L";
     };
 
     configFile = {
-      # KWin Plugins: disable flickering auto-tilers & raw translucency effect
-      "kwinrc"."Plugins"."krohnkiteEnabled" = false;
-      "kwinrc"."Plugins"."poloniumEnabled" = false;
-      "kwinrc"."Plugins"."wobblywindowsEnabled" = false;
-      # NOTE: kwin4_effect_translucency causes FLICKERING when combined with shapecorners shader.
-      # Use per-app transparency instead (kitty background_opacity, etc.)
-      "kwinrc"."Plugins"."kwin4_effect_translucencyEnabled" = lib.mkForce false;
-      "kwinrc"."Plugins"."translucencyEnabled" = lib.mkForce false;
-      # Enable native GPU blur — makes transparent app backgrounds (kitty etc.) frosted
-      "kwinrc"."Plugins"."blurEnabled" = true;
-
-      # KWin Plasma 6 Native Quick Tiling & 24px Window Gaps
-      "kwinrc"."Tiling"."padding" = 24;
-      "kwinrc"."Tiling"."activeByDefault" = true;
-      "kwinrc"."Windows"."ElectricBorders" = 2;
-      "kwinrc"."Windows"."ElectricBorderTiling" = true;
-      "kwinrc"."Windows"."ElectricBorderMaximize" = false;
-      "kwinrc"."Windows"."CornerBarrier" = false;
-
-      # Native KWin Smooth Rounded Corners Shader (14px radius + Thicker Sakura Pink Outline Border)
-      "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."Size" = 14;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."InactiveCornerRadius" = 14;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineThickness" = 3.5;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineColor" = "245,194,231";
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."ActiveOutlineUseCustom" = true;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."ActiveOutlineAlpha" = 240;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundMaximize" = false;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundTile" = false;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundFullScreen" = false;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineMaximize" = false;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineTile" = false;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineFullScreen" = false;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeNormalWindows" = true;
-      "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeDialogs" = true;
-
-      # Native Breeze Decoration with macOS traffic lights (fully supported by ShapeCorners shader)
+      # Native Breeze Window Decoration
       "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.breeze";
       "kwinrc"."org.kde.kdecoration2"."theme" = "Breeze";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XIA";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "";
-      "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
-      "kwinrc"."org.kde.kdecoration2"."BorderSizeAuto" = false;
 
-      # Mouse on Focus (Focus Follows Mouse)
+      # Standard Window Behavior
       "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
       "kwinrc"."Windows"."NextFocusPrefersMouse" = true;
-      "kwinrc"."Windows"."DelayFocusInterval" = 0;
-      "kwinrc"."Windows"."AutoRaise" = false;
-
-      # Window Placement & Dimensions (Moderate Centered Floating Window by default)
       "kwinrc"."Windows"."Placement" = "Centered";
-      "kwinrc"."Windows"."BorderlessMaximizedWindows" = false;
-      "kwinrc"."Windows"."CommandAllKey" = "Meta";
-      "kwinrc"."Windows"."CommandAll1" = "Move";
-      "kwinrc"."Windows"."CommandAll2" = "Resize";
-      "kwinrc"."Windows"."CommandAll3" = "Maximize";
-
-      # Explicit KWin Window Rule: ALWAYS spawn normal windows centered & floating with ideal size
-      "kwinrulesrc"."1"."Description" = "Default Floating Windows";
-      "kwinrulesrc"."1"."types" = "1";
-      "kwinrulesrc"."1"."wmclassmatch" = 0;
-      "kwinrulesrc"."1"."size" = "1040,650";
-      "kwinrulesrc"."1"."sizerule" = 3; # 3 = Apply on initial spawn
-      "kwinrulesrc"."1"."maximizehoriz" = false;
-      "kwinrulesrc"."1"."maximizehorizrule" = 3; # 3 = Apply on initial spawn
-      "kwinrulesrc"."1"."maximizevert" = false;
-      "kwinrulesrc"."1"."maximizevertrule" = 3; # 3 = Apply on initial spawn
-      "kwinrulesrc"."General"."count" = 1;
-      "kwinrulesrc"."General"."rules" = "1";
     };
-  };
-
-  # Quickshell Bar - source whole directory for multi-file QML components
-  xdg.configFile."quickshell" = {
-    source = ./dotfiles/quickshell;
-    recursive = true;
-  };
-  xdg.configFile."autostart/quickshell.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Quickshell Bar
-    Exec=quickshell
-    StartupNotify=false
-    Terminal=false
-  '';
-
-  # Link Nadir Custom Rice Themes (Aurorae & Plasma Desktop Theme)
-  xdg.dataFile."aurorae/themes/Sweet-Dark-transparent-Custom" = {
-    source = ./dotfiles/kde/themes/Sweet-Dark-transparent-Custom;
-    recursive = true;
-  };
-  xdg.dataFile."plasma/desktoptheme/ROUNDED-COLOR-OPAQUE-CUSTOM" = {
-    source = ./dotfiles/kde/themes/ROUNDED-COLOR-OPAQUE-CUSTOM;
-    recursive = true;
   };
 
   home.sessionVariables = {
