@@ -20,6 +20,7 @@ ShellRoot {
     property real   volumeWidgetX:   0
     property real   batteryWidgetX:  0
     property real   ccWidgetX:       0
+    property real   trayWidgetX:     0
 
     // ── Media / MPRIS ─────────────────────────────────────────
     property string playerName:   ""
@@ -52,6 +53,10 @@ ShellRoot {
     property int    netSignal:      0
     property real   prevNetRxBytes: 0
     property real   prevNetTxBytes: 0
+
+    // ── WiFi Scan ─────────────────────────────────────────────
+    property var    wifiNetworks:   []
+    property bool   wifiScanning:   false
 
     // ─────────────────────────────────────────────────────────
     // SYSTEM POLLING — all Process objects live here
@@ -236,6 +241,30 @@ ShellRoot {
     Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true
         onTriggered: if (!netProc.running) netProc.running = true }
 
+    // 8. WiFi scan (on demand)
+    Process {
+        id: wifiScanProc
+        command: ["sh", "-c", "nmcli -t -f SSID,SIGNAL,SECURITY,IN-USE dev wifi list 2>/dev/null | head -20"]
+        stdout: SplitParser {
+            onRead: function(line) {
+                var p = line.trim().split(":")
+                if (p.length >= 3 && p[0] !== "") {
+                    var nets = root.wifiNetworks.slice()
+                    nets.push({ ssid: p[0], signal: parseInt(p[1]) || 0, security: p[2] || "", active: p[3] === "*" })
+                    root.wifiNetworks = nets
+                }
+            }
+        }
+        onRunningChanged: {
+            if (!running) root.wifiScanning = false
+        }
+    }
+    function scanWifi() {
+        root.wifiNetworks = []
+        root.wifiScanning = true
+        if (!wifiScanProc.running) wifiScanProc.running = true
+    }
+
     // ─────────────────────────────────────────────────────────
     // MAIN BAR PANEL WINDOW
     // ─────────────────────────────────────────────────────────
@@ -244,6 +273,9 @@ ShellRoot {
         anchors { top: true; left: true; right: true }
         implicitHeight: barH + (root.openDropdown !== "" ? dropdownMaxH : 0)
         color: "transparent"
+
+        // Request compositor background blur behind bar
+        BackgroundEffect.blurRegion: Region { item: barCapsule }
 
         WlrLayershell.layer:         WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -267,7 +299,7 @@ ShellRoot {
             anchors { top: parent.top; topMargin: 5; left: parent.left; leftMargin: 10; right: parent.right; rightMargin: 10 }
             height: 34
             radius: 12
-            color: "#d0181825"
+            color: "#a0181825"  // more transparent for blur
             border.color: "#95cba6f7"
             border.width: 1.5
             z: 10
@@ -293,7 +325,7 @@ ShellRoot {
             // ── LEFT ROW ─────────────────────────────────────
             RowLayout {
                 anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
-                spacing: 5
+                spacing: 8
                 z: 1
 
                 // NixOS Launcher
@@ -337,12 +369,19 @@ ShellRoot {
             // ── RIGHT ROW ────────────────────────────────────
             RowLayout {
                 anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
-                spacing: 5
+                spacing: 8
                 z: 1
 
-                // System Tray (Vesktop, Steam, etc.)
+                // System Tray (Vesktop, Steam, etc.) — chevron opens dropdown
                 TrayWidget {
+                    id: trayW
                     Layout.alignment: Qt.AlignVCenter
+                    isOpen: root.openDropdown === "tray"
+                    onClicked: {
+                        var p = trayW.mapToItem(barCapsule, 0, 0)
+                        root.trayWidgetX = barCapsule.x + p.x + trayW.width / 2 - 110
+                        root.openDropdown = root.openDropdown === "tray" ? "" : "tray"
+                    }
                 }
 
                 // Noctalia Master Control Center Pill
@@ -470,6 +509,16 @@ ShellRoot {
             Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
         }
 
+        // System Tray Dropdown
+        TrayDropdown {
+            visible: root.openDropdown === "tray"
+            x: Math.max(10, Math.min(root.trayWidgetX, barWindow.width - width - 10))
+            anchors { top: barCapsule.bottom; topMargin: 6 }
+            z: 20
+            opacity: visible ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+        }
+
         // Master Control Center Dropdown
         ControlCenterDropdown {
             visible: root.openDropdown === "cc"
@@ -482,6 +531,8 @@ ShellRoot {
             netType: root.netType; netSpeed: root.netSpeed; netSSID: root.netSSID
             playerName: root.playerName; playerIcon: root.playerIcon
             trackTitle: root.trackTitle; trackArtist: root.trackArtist; isPlaying: root.isPlaying
+            wifiNetworks: root.wifiNetworks
+            wifiScanning: root.wifiScanning
             onVolumeChange: (pct) => {
                 Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (pct / 100).toFixed(2)])
                 if (!volProc.running) volProc.running = true
@@ -497,6 +548,10 @@ ShellRoot {
             onPrevTrack:      Quickshell.execDetached(["playerctl", "previous"])
             onPlayPauseTrack: Quickshell.execDetached(["playerctl", "play-pause"])
             onNextTrack:      Quickshell.execDetached(["playerctl", "next"])
+            onScanWifi:       root.scanWifi()
+            onConnectWifi: (ssid) => {
+                Quickshell.execDetached(["nmcli", "dev", "wifi", "connect", ssid])
+            }
             onOpenPowerMenu: {
                 root.openDropdown = ""
                 root.powerMenuOpen = true
@@ -549,7 +604,7 @@ ShellRoot {
                 // Header
                 RowLayout {
                     Layout.fillWidth: true
-                    Text { text: "🌸"; font.pixelSize: 18 }
+                    Text { text: "󰐥"; font.pixelSize: 18; color: "#cba6f7" }
                     ColumnLayout {
                         spacing: 1
                         Text { text: "電源メニュー • Power Menu"; font.pixelSize: 14; font.bold: true; font.family: "Noto Sans CJK JP"; color: "#cdd6f4" }
@@ -561,7 +616,7 @@ ShellRoot {
                         width: 26; height: 26; radius: 13
                         color: closeMa.containsMouse ? "#30f38ba8" : "#20313244"
                         border.color: closeMa.containsMouse ? "#f38ba8" : "#3045475a"; border.width: 1
-                        Text { anchors.centerIn: parent; text: "✕"; font.pixelSize: 11; color: "#cdd6f4" }
+                        Text { anchors.centerIn: parent; text: "󰅖"; font.pixelSize: 12; color: "#cdd6f4" }
                         MouseArea {
                             id: closeMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onClicked: root.powerMenuOpen = false

@@ -119,8 +119,8 @@ Item {
                 Repeater {
                     model: [
                         { icon: "󰌪", label: "省電力", profile: "power-saver" },
-                        { icon: "⚖", label: "バランス", profile: "balanced" },
-                        { icon: "⚡", label: "性能", profile: "performance" }
+                        { icon: "󰾅", label: "バランス", profile: "balanced" },
+                        { icon: "󰓅", label: "性能", profile: "performance" }
                     ]
                     Rectangle {
                         Layout.fillWidth: true; height: 28; radius: 7
