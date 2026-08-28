@@ -23,7 +23,14 @@
     pulse.enable = true;
   };
 
-  virtualisation.docker.enable = false;
+  # Enable Docker
+  virtualisation.docker = {
+    enable = true;
+    autoPrune = {
+      enable = true;
+      dates = "weekly";
+    };
+  };
   
   programs.gamemode.enable = true;
   programs.steam = {

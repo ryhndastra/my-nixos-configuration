@@ -87,6 +87,7 @@ in
     vulkan-tools
     vscode
     cloudflared
+    docker-compose
 
     # Hyprland Ecosystem & Illogical-Impulse / end4-pC Dependencies
     quickshellWrapped
