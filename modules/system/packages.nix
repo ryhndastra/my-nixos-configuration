@@ -48,16 +48,38 @@
     vscode
     cloudflared
 
-    # KDE Plasma Utilities & Window Rounded Shader
-    kde-rounded-corners
+    # Hyprland Ecosystem & Illogical-Impulse / end4-pC Dependencies
+    quickshell
+    matugen
+    hyprlock
+    hypridle
+    hyprpicker
+    hyprcursor
+    swww
+    fuzzel
+    wlogout
+    cliphist
+    wl-clipboard
+    grim
+    slurp
+    swappy
+    tesseract
+    playerctl
+    brightnessctl
+    pavucontrol
+    cava
+    dart-sass
+    imagemagick
+    socat
+    bc
+    bibata-cursors
+    adw-gtk3
     papirus-icon-theme
-    kdePackages.plasma-systemmonitor
-    kdePackages.spectacle
-    kdePackages.dolphin
-    kdePackages.kdegraphics-thumbnailers
-    kdePackages.ffmpegthumbs
-    kdePackages.kcalc
-    kdePackages.ark
-    kdePackages.plasma-browser-integration
+    foot
+
+    # Helper wrapper for `qs` -> `quickshell`
+    (writeShellScriptBin "qs" ''
+      exec ${quickshell}/bin/quickshell "$@"
+    '')
   ];
 }

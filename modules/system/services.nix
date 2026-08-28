@@ -31,11 +31,28 @@
     gamescopeSession.enable = true;
   };
 
-  # Desktop Manager: KDE Plasma 6 (Wayland)
-  services.desktopManager.plasma6.enable = true;
-  services.displayManager.defaultSession = "plasma";
+  # Window Manager: Hyprland (Wayland)
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
 
-  # Greeter / Display Manager (SDDM)
+  # Hyprlock PAM service for secure screen locking
+  security.pam.services.hyprlock = {};
+
+  # XDG Portals for Hyprland screen sharing & file picker
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
+    ];
+  };
+
+  # Default session for Display Manager
+  services.displayManager.defaultSession = "hyprland";
+
+  # Greeter / Display Manager (SDDM Astronaut)
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
