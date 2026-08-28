@@ -226,7 +226,6 @@ in
 
       # Native KWin Smooth Rounded Corners Shader (14px radius + Thicker Sakura Pink Outline Border)
       "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
-      "kwinrc"."Plugins"."kwin-helperEnabled" = true;
       "kwinrc"."Effect-kwin4_effect_shapecorners"."Size" = 14;
       "kwinrc"."Effect-kwin4_effect_shapecorners"."InactiveCornerRadius" = 14;
       "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineThickness" = 3.5;
@@ -300,10 +299,6 @@ in
   };
   xdg.dataFile."plasma/desktoptheme/ROUNDED-COLOR-OPAQUE-CUSTOM" = {
     source = ./dotfiles/kde/themes/ROUNDED-COLOR-OPAQUE-CUSTOM;
-    recursive = true;
-  };
-  xdg.dataFile."kwin/scripts/kwin-helper" = {
-    source = ./dotfiles/kwin-helper;
     recursive = true;
   };
 
