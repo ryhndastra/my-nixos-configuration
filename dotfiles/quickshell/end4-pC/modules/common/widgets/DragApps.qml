@@ -115,7 +115,7 @@ Item {
                     anchors.centerIn: parent
                     source: Quickshell.iconPath(
                         AppSearch.guessIcon(root._workOrder[root.activeDragVisualIndex] ?? ""),
-                        "image-missing")
+                        "application-x-executable")
                     implicitSize: root.btnSize * 0.65
                     opacity: 0.85
 
@@ -175,7 +175,7 @@ Item {
                         anchors.centerIn: parent
                         source: Quickshell.iconPath(
                             AppSearch.guessIcon(slotItem.appId),
-                            "image-missing")
+                            "application-x-executable")
                         implicitSize: 33
                     }
 

@@ -29,6 +29,10 @@ let
 in
 {
   fonts.packages = with pkgs; [
+    material-symbols
+    google-fonts
+    rubik
+    inter
     adwaita-fonts
     corefonts
     dejavu_fonts
@@ -102,6 +106,9 @@ in
     bibata-cursors
     adw-gtk3
     papirus-icon-theme
+    kdePackages.breeze-icons
+    adwaita-icon-theme
+    hicolor-icon-theme
     foot
     libsecret
     ddcutil
