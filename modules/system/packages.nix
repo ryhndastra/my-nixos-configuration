@@ -120,6 +120,7 @@ in
     hicolor-icon-theme
     foot
     libsecret
+    libqalculate
     ddcutil
   ];
 }
