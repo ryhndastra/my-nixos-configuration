@@ -23,8 +23,8 @@ Item {
         // Sakura Flower Glyph in Sakura Pink (#f5c2e7)
         Text {
             anchors.centerIn: parent
-            text: "󰉉"
-            font.pixelSize: 14
+            text: "󰉊"
+            font.pixelSize: 15
             font.family: "JetBrainsMono Nerd Font"
             color: root.isOpen ? "#f5c2e7" : (ma.containsMouse ? "#ffffff" : "#f5c2e7")
         }

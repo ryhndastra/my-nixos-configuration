@@ -296,6 +296,10 @@ in
     source = ./dotfiles/kde/themes/ROUNDED-COLOR-OPAQUE-CUSTOM;
     recursive = true;
   };
+  xdg.dataFile."kwin/scripts/kwin-helper" = {
+    source = ./dotfiles/kwin-helper;
+    recursive = true;
+  };
 
   home.sessionVariables = {
     NIXOS_OZONE_WL = "1";
