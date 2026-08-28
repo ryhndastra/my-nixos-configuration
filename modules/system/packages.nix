@@ -15,6 +15,13 @@ let
     pkgs.kdePackages.kdialog
   ];
 
+  iconSearchPath = lib.makeSearchPath "share" [
+    pkgs.kdePackages.breeze-icons
+    pkgs.papirus-icon-theme
+    pkgs.adwaita-icon-theme
+    pkgs.hicolor-icon-theme
+  ];
+
   quickshellWrapped = pkgs.symlinkJoin {
     name = "quickshell-wrapped";
     paths = [ pkgs.quickshell ];
@@ -22,7 +29,8 @@ let
     postBuild = ''
       wrapProgram $out/bin/quickshell \
         --prefix QML2_IMPORT_PATH : "${qmlSearchPath}" \
-        --prefix QML_IMPORT_PATH : "${qmlSearchPath}"
+        --prefix QML_IMPORT_PATH : "${qmlSearchPath}" \
+        --prefix XDG_DATA_DIRS : "${iconSearchPath}"
       ln -sf $out/bin/quickshell $out/bin/qs
     '';
   };
@@ -69,6 +77,7 @@ in
     openssh
     p7zip
     pciutils
+    psmisc
     ripgrep
     rsync
     seahorse
