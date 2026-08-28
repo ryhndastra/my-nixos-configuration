@@ -219,11 +219,16 @@ in
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
-      # Quick Tiling (Native KWin Tile Snapping)
+      # Quick Tiling (Native KWin Tile Snapping & Quarter Tiles)
       "kwin"."Window Quick Tile Left" = "Meta+Left";
       "kwin"."Window Quick Tile Right" = "Meta+Right";
       "kwin"."Window Quick Tile Top" = "Meta+Up";
       "kwin"."Window Quick Tile Bottom" = "Meta+Down";
+      "kwin"."Window Quick Tile Top Left" = "Meta+Shift+Left";
+      "kwin"."Window Quick Tile Top Right" = "Meta+Shift+Right";
+      "kwin"."Window Quick Tile Bottom Left" = "Meta+Shift+Down";
+      "kwin"."Window Quick Tile Bottom Right" = "Meta+Shift+Up";
+      "kwin"."Edit Tiles" = "Meta+Shift+T";
 
       # Workspaces Navigation
       "kwin"."Switch to Desktop 1" = "Meta+1";
