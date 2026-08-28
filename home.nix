@@ -245,10 +245,16 @@ in
       # Sweet Dark Transparent Custom Window Decoration (Nadir Rice)
       "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";
       "kwinrc"."org.kde.kdecoration2"."theme" = "__aurorae__svg__Sweet-Dark-transparent-Custom";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
-      "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XIA";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "";
+      "kwinrc"."org.kde.kdecoration2"."BorderSize" = "Normal";
       "kwinrc"."org.kde.kdecoration2"."BorderSizeAuto" = false;
+
+      # KWin Plasma 6 Tiling & Padding (16px aesthetic gaps)
+      "kwinrc"."Tiling"."padding" = 16;
+      "kwinrc"."Windows"."ElectricBorders" = 2;
+      "kwinrc"."Windows"."ElectricBorderTiling" = true;
+      "kwinrc"."Windows"."ElectricBorderMaximize" = false;
 
       # Standard Window Behavior
       "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
