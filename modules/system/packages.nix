@@ -1,5 +1,32 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
+let
+  qmlSearchPath = lib.makeSearchPath "lib/qt-6/qml" [
+    pkgs.qt6.qt5compat
+    pkgs.qt6.qtpositioning
+    pkgs.qt6.qtlocation
+    pkgs.qt6.qtmultimedia
+    pkgs.qt6.qtsensors
+    pkgs.qt6.qtsvg
+    pkgs.qt6.qtimageformats
+    pkgs.qt6.qtdeclarative
+    pkgs.kdePackages.kirigami
+    pkgs.kdePackages.syntax-highlighting
+    pkgs.kdePackages.kdialog
+  ];
+
+  quickshellWrapped = pkgs.symlinkJoin {
+    name = "quickshell-wrapped";
+    paths = [ pkgs.quickshell ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/quickshell \
+        --prefix QML2_IMPORT_PATH : "${qmlSearchPath}" \
+        --prefix QML_IMPORT_PATH : "${qmlSearchPath}"
+      ln -sf $out/bin/quickshell $out/bin/qs
+    '';
+  };
+in
 {
   fonts.packages = with pkgs; [
     adwaita-fonts
@@ -49,7 +76,7 @@
     cloudflared
 
     # Hyprland Ecosystem & Illogical-Impulse / end4-pC Dependencies
-    quickshell
+    quickshellWrapped
     matugen
     hyprlock
     hypridle
@@ -76,10 +103,7 @@
     adw-gtk3
     papirus-icon-theme
     foot
-
-    # Helper wrapper for `qs` -> `quickshell`
-    (writeShellScriptBin "qs" ''
-      exec ${quickshell}/bin/quickshell "$@"
-    '')
+    libsecret
+    ddcutil
   ];
 }
