@@ -71,27 +71,37 @@ ShellRoot {
     Timer { interval: 350; running: true; repeat: true
         onTriggered: if (!desktopProc.running) desktopProc.running = true }
 
-    // 2. RAM + CPU (every 3s)
+    // 2. RAM + CPU (every 2s) — uses /proc/stat delta instead of slow `top`
+    property real prevCpuIdle: 0
+    property real prevCpuTotal: 0
     Process {
         id: statsProc
         command: ["sh", "-c",
-            "cpu=$(top -bn1 | grep -m1 'Cpu' | awk '{print int($2)}' 2>/dev/null || echo 0);" +
+            "cpu=$(awk '/^cpu /{print $2+$3+$4+$5+$6+$7+$8\"|\"$5}' /proc/stat);" +
             "ram=$(free | awk 'NR==2{printf \"%d|%d|%d\", $3/$2*100, $3/1024, $2/1024}');" +
             "echo \"$cpu|$ram\""]
         stdout: SplitParser {
             onRead: function(line) {
                 var p = line.trim().split("|")
-                if (p.length >= 4) {
-                    root.cpuPercent  = parseInt(p[0]) || 0
-                    root.ramPercent  = parseInt(p[1]) || 0
-                    var used = Math.round(parseInt(p[2]) / 1024 * 10) / 10
-                    var total = Math.round(parseInt(p[3]) / 1024 * 10) / 10
-                    root.ramDetail = used + "G / " + total + "G"
+                if (p.length >= 5) {
+                    var total = parseFloat(p[0]) || 0
+                    var idle  = parseFloat(p[1]) || 0
+                    if (root.prevCpuTotal > 0) {
+                        var dt = total - root.prevCpuTotal
+                        var di = idle  - root.prevCpuIdle
+                        root.cpuPercent = dt > 0 ? Math.round((1 - di / dt) * 100) : 0
+                    }
+                    root.prevCpuTotal = total
+                    root.prevCpuIdle  = idle
+                    root.ramPercent  = parseInt(p[2]) || 0
+                    var used = Math.round(parseInt(p[3]) / 1024 * 10) / 10
+                    var total2 = Math.round(parseInt(p[4]) / 1024 * 10) / 10
+                    root.ramDetail = used + "G / " + total2 + "G"
                 }
             }
         }
     }
-    Timer { interval: 3000; running: true; repeat: true; triggeredOnStart: true
+    Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true
         onTriggered: if (!statsProc.running) statsProc.running = true }
 
     // 3. Battery (every 10s)
@@ -268,13 +278,23 @@ ShellRoot {
                 height: 1; color: "#45ffffff"; radius: 1
             }
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 8
-                anchors.rightMargin: 8
-                spacing: 5
+            // ── Absolutely Centered Clock (immune to left/right width changes) ──
+            ClockWidget {
+                id: clockW
+                anchors.centerIn: parent
+                z: 2
+                isOpen: root.openDropdown === "clock"
+                onClicked: {
+                    root.clockWidgetX = barCapsule.x + barCapsule.width / 2 - 143
+                    root.openDropdown = root.openDropdown === "clock" ? "" : "clock"
+                }
+            }
 
-                // ── LEFT ─────────────────────────────────────
+            // ── LEFT ROW ─────────────────────────────────────
+            RowLayout {
+                anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
+                spacing: 5
+                z: 1
 
                 // NixOS Launcher
                 Rectangle {
@@ -312,24 +332,13 @@ ShellRoot {
                     onPlayPause: Quickshell.execDetached(["playerctl", "play-pause"])
                     onNext:      Quickshell.execDetached(["playerctl", "next"])
                 }
+            }
 
-                Item { Layout.fillWidth: true }
-
-                // ── CENTER ────────────────────────────────────
-                ClockWidget {
-                    id: clockW
-                    Layout.alignment: Qt.AlignVCenter
-                    isOpen: root.openDropdown === "clock"
-                    onClicked: {
-                        var p = clockW.mapToItem(barCapsule, 0, 0)
-                        root.clockWidgetX = barCapsule.x + p.x + clockW.width / 2 - 143
-                        root.openDropdown = root.openDropdown === "clock" ? "" : "clock"
-                    }
-                }
-
-                Item { Layout.fillWidth: true }
-
-                // ── RIGHT ─────────────────────────────────────
+            // ── RIGHT ROW ────────────────────────────────────
+            RowLayout {
+                anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
+                spacing: 5
+                z: 1
 
                 // System Tray (Vesktop, Steam, etc.)
                 TrayWidget {

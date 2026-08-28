@@ -3,10 +3,12 @@ import QtQuick.Layouts
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 
-// System Tray Widget — displays apps like Vesktop, Steam, OBS, Telegram, etc.
+// System Tray Widget — chevron toggle for collapsed/expanded tray icons
 Item {
     id: root
-    implicitWidth: trayRow.implicitWidth + (trayRepeater.count > 0 ? 12 : 0)
+    property bool expanded: false
+
+    implicitWidth: trayContainer.implicitWidth + 6
     implicitHeight: 28
     visible: trayRepeater.count > 0
 
@@ -18,43 +20,82 @@ Item {
         border.width: 1
 
         Row {
-            id: trayRow
+            id: trayContainer
             anchors.centerIn: parent
-            spacing: 5
+            spacing: 4
 
-            Repeater {
-                id: trayRepeater
-                model: SystemTray.items
+            // Chevron toggle
+            Rectangle {
+                width: 18; height: 20; radius: 4
+                color: chevMa.containsMouse ? "#30cba6f7" : "transparent"
+                anchors.verticalCenter: parent.verticalCenter
 
-                Rectangle {
-                    width: 22
-                    height: 22
-                    radius: 5
-                    color: trayMa.containsMouse ? "#30cba6f7" : "transparent"
-                    Behavior on color { ColorAnimation { duration: 100 } }
+                Text {
+                    anchors.centerIn: parent
+                    text: root.expanded ? "󰅁" : "󰅂"
+                    font.pixelSize: 11
+                    color: "#7f849c"
+                }
 
-                    IconImage {
-                        anchors.centerIn: parent
-                        width: 16
-                        height: 16
-                        source: modelData.icon
-                    }
+                MouseArea {
+                    id: chevMa; anchors.fill: parent; hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.expanded = !root.expanded
+                }
+            }
 
-                    MouseArea {
-                        id: trayMa
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
-                        onClicked: (mouse) => {
-                            if (mouse.button === Qt.LeftButton) {
-                                modelData.activate()
-                            } else if (mouse.button === Qt.RightButton) {
-                                modelData.secondaryActivate()
+            // Tray icons (only visible when expanded)
+            Row {
+                id: trayRow
+                spacing: 4
+                visible: root.expanded
+                anchors.verticalCenter: parent.verticalCenter
+
+                Repeater {
+                    id: trayRepeater
+                    model: SystemTray.items
+
+                    Rectangle {
+                        width: 22; height: 22; radius: 5
+                        color: trayMa.containsMouse ? "#30cba6f7" : "transparent"
+                        Behavior on color { ColorAnimation { duration: 80 } }
+
+                        IconImage {
+                            anchors.centerIn: parent
+                            width: 16; height: 16
+                            source: modelData.icon
+                        }
+
+                        MouseArea {
+                            id: trayMa
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onClicked: (mouse) => {
+                                if (modelData.hasMenu) {
+                                    // Open the DBusMenu popup at click position
+                                    modelData.display(root, mouse.x, mouse.y)
+                                } else if (mouse.button === Qt.LeftButton) {
+                                    modelData.activate()
+                                } else {
+                                    modelData.secondaryActivate()
+                                }
                             }
                         }
                     }
                 }
+            }
+
+            // Badge count when collapsed
+            Text {
+                visible: !root.expanded && trayRepeater.count > 0
+                text: trayRepeater.count.toString()
+                font.pixelSize: 9
+                font.bold: true
+                font.family: "JetBrainsMono Nerd Font"
+                color: "#7f849c"
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
     }

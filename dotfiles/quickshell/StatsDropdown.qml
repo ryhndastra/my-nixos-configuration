@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 
 // Stats Dropdown — rich CPU/RAM display with bars, Japanese labels
 Item {
