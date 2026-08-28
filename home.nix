@@ -263,6 +263,19 @@ in
       "kwinrc"."Windows"."ElectricBorderTiling" = true;
       "kwinrc"."Windows"."ElectricBorderMaximize" = false;
 
+      # Native KWin Smooth Rounded Corners Shader (12px radius + 2.5px Lavender Outline Border)
+      "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."Size" = 12;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."InactiveCornerRadius" = 12;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineThickness" = 2.5;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineColor" = "203,166,247";
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."ActiveOutlineUseCustom" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."ActiveOutlineAlpha" = 240;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundMaximize" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineMaximize" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeNormalWindows" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeDialogs" = true;
+
       # Standard Window Behavior
       "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
       "kwinrc"."Windows"."NextFocusPrefersMouse" = true;

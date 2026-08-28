@@ -48,7 +48,8 @@
     vscode
     cloudflared
 
-    # KDE Plasma Utilities
+    # KDE Plasma Utilities & Window Rounded Shader
+    kde-rounded-corners
     papirus-icon-theme
     kdePackages.plasma-systemmonitor
     kdePackages.spectacle
