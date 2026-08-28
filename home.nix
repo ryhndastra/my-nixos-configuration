@@ -123,6 +123,7 @@ in
       nightLight.enable = false;
       virtualDesktops = {
         number = 5;
+        names = [ "Ⅰ" "Ⅱ" "Ⅲ" "Ⅳ" "Ⅴ" ];
         rows = 1;
       };
     };
@@ -136,7 +137,7 @@ in
         floating = true;
         widgets = [
           {
-            name = "org.kde.plasma.kicker";
+            name = "org.kde.plasma.kickoff";
             config = {
               General.icon = "nix-snowflake";
             };
@@ -164,7 +165,7 @@ in
             config = {
               General = {
                 showWindowOutlines = false;
-                displayedText = "Number";
+                displayedText = "Name";
               };
             };
           }
@@ -212,8 +213,6 @@ in
       "services/org.kde.spectacle.desktop"."_launch" = "Print";
 
       # Launcher & Overview
-      "org.kde.plasma.kicker"."_launch" = "Meta";
-      "services/org.kde.plasma.kicker.desktop"."_launch" = "Meta";
       "org.kde.plasma.kickoff"."_launch" = "Meta";
       "services/org.kde.plasma.kickoff.desktop"."_launch" = "Meta";
       "krunner.desktop"."_launch" = "Meta+Space";
