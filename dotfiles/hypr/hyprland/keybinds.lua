@@ -187,31 +187,31 @@ hl.bind("SUPER + Semicolon", hl.dsp.layout("splitratio -0.1"), { repeating = tru
 hl.bind("SUPER + Apostrophe", hl.dsp.layout("splitratio +0.1"), { repeating = true })
 --# Positioning mode
 hl.bind("SUPER + ALT + Space", hl.dsp.window.float({ action = "toggle" }), { description = "Window: Float/Tile" })
-hl.bind("SUPER + D", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }),
-    { description = "Window: Maximize" })
-hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }),
+hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }),
+    { description = "Window: Maximize (keep bar/gaps)" })
+hl.bind("SUPER + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }),
     { description = "Window: Fullscreen" })
 hl.bind("SUPER + ALT + F", hl.dsp.window.fullscreen_state({ internal = 0, client = 3, action = "toggle" }),
     { description = "Window: Fullscreen spoof" })
 hl.bind("SUPER + P", hl.dsp.window.pin(), { description = "Window: Pin" })
 
---#/# bind = SUPER+ALT, Hash,, -- Send to workspace -- (1, 2, 3,...)
+--#/# bind = SUPER+SHIFT, Hash,, -- Send to workspace -- (1, 2, 3,...)
 for i = 1, 10 do
-    hl.bind("SUPER + ALT + " .. (i % 10), function()
+    hl.bind("SUPER + SHIFT + " .. (i % 10), function()
         hl.dispatch(hl.dsp.window.move({ workspace = workspace_in_group(i), follow = false }))
     end, { description = "Window: Send to workspace " .. i })
 end
---# We also use raw keycodes because some keyboard layouts register number keys as different chars. The codes can be verified with `wev`
--- for i = 1, 10 do
---     local numberkey = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }
---     hl.bind("SUPER + ALT + code:" .. numberkey[i], function()
---         hl.dispatch(hl.dsp.window.move({ workspace = workspace_in_group(i), follow = false }))
---     end)
--- end
+--# Top row number keycodes
+for i = 1, 10 do
+    local numberkey = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }
+    hl.bind("SUPER + SHIFT + code:" .. numberkey[i], function()
+        hl.dispatch(hl.dsp.window.move({ workspace = workspace_in_group(i), follow = false }))
+    end)
+end
 --# keypad numbers
 for i = 1, 10 do
     local numpadkey = { 87, 88, 89, 83, 84, 85, 79, 80, 81, 90 }
-    hl.bind("SUPER + ALT + code:" .. numpadkey[i], function()
+    hl.bind("SUPER + SHIFT + code:" .. numpadkey[i], function()
         hl.dispatch(hl.dsp.window.move({ workspace = workspace_in_group(i), follow = false }))
     end)
 end
