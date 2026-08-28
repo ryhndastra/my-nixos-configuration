@@ -82,7 +82,7 @@ in
     hypridle
     hyprpicker
     hyprcursor
-    swww
+    awww
     fuzzel
     wlogout
     cliphist
