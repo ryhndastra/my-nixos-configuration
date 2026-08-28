@@ -510,6 +510,7 @@ MouseArea {
                                     id: categoryCombo
                                     visible: root.source === "wallhaven"
                                     implicitWidth: 105
+                                    openUpwards: true
                                     model: [
                                         { value: "all",     displayName: "All" },
                                         { value: "anime",   displayName: "Anime" },
@@ -526,7 +527,8 @@ MouseArea {
                                 StyledComboBox {
                                     id: purityCombo
                                     visible: root.source === "wallhaven"
-                                    implicitWidth: 120
+                                    implicitWidth: 130
+                                    openUpwards: true
                                     model: [
                                         { value: "nsfw",    displayName: "All (R18/NSFW)" },
                                         { value: "r18",     displayName: "R18 Only" },

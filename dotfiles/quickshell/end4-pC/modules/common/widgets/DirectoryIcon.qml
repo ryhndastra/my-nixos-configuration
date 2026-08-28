@@ -1,41 +1,27 @@
 import QtQuick
-import Quickshell
-import Quickshell.Io
 import qs.modules.common
-import qs.modules.common.functions
+import qs.modules.common.widgets
 
-// From https://github.com/caelestia-dots/shell with modifications.
-// License: GPLv3
-
-Image {
+Item {
     id: root
     required property var fileModelData
-    asynchronous: true
-    fillMode: Image.PreserveAspectFit
 
-    source: {
-        if (!fileModelData.fileIsDir)
-            return Quickshell.iconPath("application-x-zerosize", "text-x-generic");
-
-        if ([Directories.documents, Directories.downloads, Directories.music, Directories.pictures, Directories.videos].some(dir => FileUtils.trimFileProtocol(dir) === fileModelData.filePath))
-            return Quickshell.iconPath(`folder-${fileModelData.fileName.toLowerCase()}`, "folder");
-
-        return Quickshell.iconPath("inode-directory", "folder");
-    }
-
-    onStatusChanged: {
-        if (status === Image.Error)
-            source = Quickshell.iconPath("folder", "user-desktop");
-    }
-
-    Process {
-        running: !fileModelData.fileIsDir
-        command: ["file", "--mime", "-b", fileModelData.filePath]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const mime = text.split(";")[0].replace("/", "-");
-                root.source = Images.validImageTypes.some(t => mime === `image-${t}`) ? fileModelData.fileUrl : Quickshell.iconPath(mime, "folder");
-            }
+    MaterialSymbol {
+        anchors.centerIn: parent
+        iconSize: Math.min(parent.width, parent.height) * 0.55
+        color: Appearance.colors.colPrimary
+        text: {
+            const name = fileModelData.fileName.toLowerCase();
+            if (name.includes("picture") || name.includes("photo") || name.includes("wall")) return "photo_library";
+            if (name.includes("music") || name.includes("audio")) return "library_music";
+            if (name.includes("video") || name.includes("movie")) return "movie";
+            if (name.includes("download")) return "download";
+            if (name.includes("doc")) return "description";
+            if (name.includes("desktop")) return "desktop_windows";
+            if (name.includes("template")) return "layers";
+            if (name.includes("public")) return "public";
+            if (name.includes("project") || name.includes("code")) return "code";
+            return "folder";
         }
     }
 }

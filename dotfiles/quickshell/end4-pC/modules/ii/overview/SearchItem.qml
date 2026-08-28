@@ -154,10 +154,24 @@ RippleButton {
 
         Component {
             id: iconImageComponent
-            IconImage {
-                source: Quickshell.iconPath(root.iconName, "application-x-executable")
-                width: 35
-                height: 35
+            Item {
+                implicitWidth: 35
+                implicitHeight: 35
+
+                IconImage {
+                    id: img
+                    anchors.fill: parent
+                    source: Quickshell.iconPath(root.iconName, "application-x-executable")
+                    visible: status !== Image.Error
+                }
+
+                MaterialSymbol {
+                    anchors.centerIn: parent
+                    visible: img.status === Image.Error || !img.visible
+                    text: "apps"
+                    iconSize: 28
+                    color: root.colForeground
+                }
             }
         }
 

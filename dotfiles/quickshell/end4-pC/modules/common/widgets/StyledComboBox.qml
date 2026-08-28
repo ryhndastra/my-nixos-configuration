@@ -157,11 +157,14 @@ ComboBox {
         }
     }
 
+    property bool openUpwards: false
+
     popup: Popup {
-        y: root.height + 4
-        width: root.width
+        y: root.openUpwards ? -height - 4 : root.height + 4
+        width: Math.max(root.width, 140)
         height: Math.min(listView.contentHeight + topPadding + bottomPadding, 300)
         padding: 8
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         enter: Transition {
             PropertyAnimation {
