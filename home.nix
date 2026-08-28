@@ -136,7 +136,7 @@ in
         floating = true;
         widgets = [
           {
-            name = "org.kde.plasma.kickoff";
+            name = "org.kde.plasma.kicker";
             config = {
               General.icon = "nix-snowflake";
             };
@@ -212,6 +212,8 @@ in
       "services/org.kde.spectacle.desktop"."_launch" = "Print";
 
       # Launcher & Overview
+      "org.kde.plasma.kicker"."_launch" = "Meta";
+      "services/org.kde.plasma.kicker.desktop"."_launch" = "Meta";
       "org.kde.plasma.kickoff"."_launch" = "Meta";
       "services/org.kde.plasma.kickoff.desktop"."_launch" = "Meta";
       "krunner.desktop"."_launch" = "Meta+Space";
