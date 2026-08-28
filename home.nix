@@ -130,12 +130,11 @@ in
 
     # Nadir Rice Panels: 1) Floating Top Bar + 2) Centered Floating Bottom Dock
     panels = [
-      # Top Bar (32px Floating Rounded Pill Bar - Locked to Floating Capsule)
+      # Top Bar (32px Floating Rounded Pill Bar)
       {
         location = "top";
         height = 32;
         floating = true;
-        hiding = "windowsgobelow";
         widgets = [
           {
             name = "org.kde.plasma.kickoff";
