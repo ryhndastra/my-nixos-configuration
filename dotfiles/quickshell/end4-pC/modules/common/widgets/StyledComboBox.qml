@@ -89,6 +89,7 @@ ComboBox {
         id: itemDelegate
         width: ListView.view ? ListView.view.width : root.width
         implicitHeight: 40
+        hoverEnabled: true
 
         required property var model
         required property int index
@@ -112,12 +113,6 @@ ComboBox {
 
             Behavior on color {
                 animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.NoButton
-                cursorShape: Qt.PointingHandCursor
             }
         }
 

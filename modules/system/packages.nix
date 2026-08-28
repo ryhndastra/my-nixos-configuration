@@ -118,7 +118,6 @@ in
     kdePackages.breeze-icons
     adwaita-icon-theme
     hicolor-icon-theme
-    foot
     libsecret
     libqalculate
     ddcutil
