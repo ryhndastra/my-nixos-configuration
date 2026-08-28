@@ -53,6 +53,15 @@ Singleton {
         "sfw":     "100",
         "sketchy": "110",
         "nsfw":    "111",
+        "r18":     "001",
+    })
+
+    // ─── Categories wallhaven ───
+    readonly property var categoryMap: ({
+        "all":     "111",
+        "anime":   "010",
+        "general": "100",
+        "people":  "001",
     })
 
     function fetch() {
@@ -66,7 +75,7 @@ Singleton {
 
     function nextPage() {
         if (root.loading) return;
-        if (root.provider !== "unsplash" && root.totalPages > 0 && root.page >= root.totalPages) return;  // NUEVO: no pedir de más
+        if (root.provider !== "unsplash" && root.totalPages > 0 && root.page >= root.totalPages) return;
         root.appending = true;   
         root.page += 1;
         _doFetch();
@@ -95,13 +104,14 @@ Singleton {
     }
 
     function _fetchWallhaven() {
-        const res      = root.resolutionMap["wallhaven"][root.resolution] ?? "1920x1080";
-        const purity   = root.purityMap[root.purity] ?? "100";
-        const apikey   = root.wallhavenApiKey.length > 0 ? `&apikey=${root.wallhavenApiKey}` : "";
-        const q        = root.query.length > 0 ? `&q=${encodeURIComponent(root.query)}` : ""; 
-        const seedParam = root.seed.length > 0 ? `&seed=${root.seed}` : "";
+        const res        = root.resolutionMap["wallhaven"][root.resolution] ?? "1920x1080";
+        const purity     = root.purityMap[root.purity] ?? "111";
+        const categories = root.categoryMap[root.category] ?? "111";
+        const apikey     = root.wallhavenApiKey.length > 0 ? `&apikey=${root.wallhavenApiKey}` : "";
+        const q          = root.query.length > 0 ? `&q=${encodeURIComponent(root.query)}` : ""; 
+        const seedParam  = root.seed.length > 0 ? `&seed=${root.seed}` : "";
 
-        const url = `https://wallhaven.cc/api/v1/search?sorting=random&purity=${purity}&categories=100&ratios=16x9&atleast=${res}&page=${root.page}${seedParam}${q}${apikey}`;
+        const url = `https://wallhaven.cc/api/v1/search?sorting=random&purity=${purity}&categories=${categories}&ratios=16x9&atleast=${res}&page=${root.page}${seedParam}${q}${apikey}`;
 
         fetchProc.provider = "wallhaven";
         fetchProc.command = ["curl", "-s", url];

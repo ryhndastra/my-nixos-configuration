@@ -506,6 +506,40 @@ MouseArea {
                             active: root.source !== "local"
                             visible: active
                             sourceComponent: Toolbar {
+                                StyledComboBox {
+                                    id: categoryCombo
+                                    visible: root.source === "wallhaven"
+                                    implicitWidth: 105
+                                    model: [
+                                        { value: "all",     displayName: "All" },
+                                        { value: "anime",   displayName: "Anime" },
+                                        { value: "general", displayName: "General" },
+                                        { value: "people",  displayName: "People" },
+                                    ]
+                                    textRole: "displayName"
+                                    onCurrentIndexChanged: {
+                                        OnlineWallpapers.category = model[currentIndex].value;
+                                        OnlineWallpapers.fetch();
+                                    }
+                                }
+
+                                StyledComboBox {
+                                    id: purityCombo
+                                    visible: root.source === "wallhaven"
+                                    implicitWidth: 120
+                                    model: [
+                                        { value: "nsfw",    displayName: "All (R18/NSFW)" },
+                                        { value: "r18",     displayName: "R18 Only" },
+                                        { value: "sketchy", displayName: "Sketchy" },
+                                        { value: "sfw",     displayName: "SFW Only" },
+                                    ]
+                                    textRole: "displayName"
+                                    onCurrentIndexChanged: {
+                                        OnlineWallpapers.purity = model[currentIndex].value;
+                                        OnlineWallpapers.fetch();
+                                    }
+                                }
+
                                 ToolbarTextField {
                                     id: onlineSearchField
                                     placeholderText: Translation.tr("Search online wallpapers")
