@@ -37,6 +37,7 @@ Item {
     signal openPowerMenu()
     signal scanWifi()
     signal connectWifi(string ssid)
+    signal toggleWifi(bool enable)
 
     // Active page: "home" | "wifi" | "audio"
     property string activePage: "home"
@@ -164,7 +165,7 @@ Item {
                             border.color: root.netType !== "none" ? "#89b4fa" : "#3045475a"; border.width: 1
                             RowLayout { anchors.centerIn: parent; spacing: 4
                                 Text { text: root.netType === "wifi" ? "󰤨" : "󰈀"; font.pixelSize: 12; color: root.netType !== "none" ? "#89b4fa" : "#6c7086" }
-                                Text { text: root.netSSID !== "" ? root.netSSID : (root.netType === "ethernet" ? "有線" : "OFF"); font.pixelSize: 9; font.bold: true; font.family: "Noto Sans CJK JP"; color: "#cdd6f4" }
+                                Text { text: root.netSSID !== "" ? root.netSSID : (root.netType === "ethernet" ? "有線" : (root.wifiEnabled ? "Wi-Fi オン" : "オフライン")); font.pixelSize: 9; font.bold: true; font.family: "Noto Sans CJK JP"; color: "#cdd6f4" }
                             }
                             MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.activePage = "wifi" }
                         }
@@ -290,17 +291,19 @@ Item {
                     spacing: 8
                     visible: root.activePage === "wifi"
 
-                    // Header
+                    // Header with Master ON/OFF Switch
                     RowLayout {
                         Text { text: "󰤨"; font.pixelSize: 16; color: "#89b4fa" }
                         ColumnLayout { spacing: 1
-                            Text { text: "ネットワーク"; font.pixelSize: 12; font.bold: true; font.family: "Noto Sans CJK JP"; color: "#cdd6f4" }
-                            Text { text: "WiFi Networks"; font.pixelSize: 8; color: "#585b70" }
+                            Text { text: "Wi-Fi ネットワーク"; font.pixelSize: 12; font.bold: true; font.family: "Noto Sans CJK JP"; color: "#cdd6f4" }
+                            Text { text: root.wifiEnabled ? "Wi-Fi 有効" : "Wi-Fi 無効"; font.pixelSize: 8; color: root.wifiEnabled ? "#a6e3a1" : "#f38ba8" }
                         }
                         Item { Layout.fillWidth: true }
+
                         // Scan button
                         Rectangle {
-                            width: 60; height: 24; radius: 6
+                            visible: root.wifiEnabled
+                            width: 60; height: 22; radius: 6
                             color: scanMa.containsMouse ? "#3089b4fa" : "#18313244"
                             border.color: scanMa.containsMouse ? "#89b4fa" : "#3045475a"; border.width: 1
                             Row { anchors.centerIn: parent; spacing: 3
@@ -310,40 +313,83 @@ Item {
                             MouseArea { id: scanMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                                 onClicked: root.scanWifi() }
                         }
+
+                        // Wi-Fi Master Toggle Switch (iOS / Material style)
+                        Rectangle {
+                            width: 38; height: 20; radius: 10
+                            color: root.wifiEnabled ? "#a6e3a1" : "#313244"
+                            border.color: root.wifiEnabled ? "#a6e3a1" : "#45475a"; border.width: 1
+                            Behavior on color { ColorAnimation { duration: 150 } }
+
+                            Rectangle {
+                                x: root.wifiEnabled ? parent.width - width - 2 : 2
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 16; height: 16; radius: 8
+                                color: root.wifiEnabled ? "#11111b" : "#a6adc8"
+                                Behavior on x { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.toggleWifi(!root.wifiEnabled)
+                            }
+                        }
                     }
 
-                    // Current connection
+                    // Current connection status card
                     Rectangle {
                         Layout.fillWidth: true; height: 38; radius: 8
-                        color: "#2089b4fa"
-                        border.color: "#89b4fa"; border.width: 1
+                        color: root.netType !== "none" ? "#2089b4fa" : "#14313244"
+                        border.color: root.netType !== "none" ? "#89b4fa" : "#3045475a"; border.width: 1
                         RowLayout { anchors.fill: parent; anchors.margins: 8; spacing: 6
-                            Text { text: root.netType === "wifi" ? "󰤨" : "󰈀"; font.pixelSize: 14; color: "#89b4fa" }
+                            Text { text: root.netType === "wifi" ? "󰤨" : (root.netType === "ethernet" ? "󰈀" : "󰤭"); font.pixelSize: 14; color: root.netType !== "none" ? "#89b4fa" : "#6c7086" }
                             ColumnLayout { Layout.fillWidth: true; spacing: 0
                                 Text { text: root.netSSID !== "" ? root.netSSID : (root.netType === "ethernet" ? "有線LAN 接続中" : "未接続"); font.pixelSize: 10; font.bold: true; color: "#cdd6f4" }
-                                Text { text: root.netSpeed + " • " + root.netType; font.pixelSize: 8; color: "#7f849c" }
+                                Text { text: root.netSpeed + " • " + (root.netType === "none" ? "オフライン" : root.netType); font.pixelSize: 8; color: "#7f849c" }
                             }
-                            Text { text: "接続中"; font.pixelSize: 8; font.family: "Noto Sans CJK JP"; color: "#89b4fa" }
+                            Text { text: root.netType !== "none" ? "接続中" : "切断"; font.pixelSize: 8; font.family: "Noto Sans CJK JP"; color: root.netType !== "none" ? "#89b4fa" : "#6c7086" }
                         }
                     }
 
                     Rectangle { Layout.fillWidth: true; height: 1; color: "#20cba6f7" }
 
-                    // WiFi list
+                    // Wi-Fi Disabled State Card
+                    Rectangle {
+                        visible: !root.wifiEnabled
+                        Layout.fillWidth: true; height: 100; radius: 8
+                        color: "#18313244"; border.color: "#3045475a"; border.width: 1
+                        ColumnLayout {
+                            anchors.centerIn: parent; spacing: 6
+                            Text { text: "󰤭"; font.pixelSize: 24; color: "#6c7086"; Layout.alignment: Qt.AlignHCenter }
+                            Text { text: "Wi-Fiが無効になっています"; font.pixelSize: 10; font.family: "Noto Sans CJK JP"; color: "#a6adc8"; Layout.alignment: Qt.AlignHCenter }
+                            Rectangle {
+                                Layout.alignment: Qt.AlignHCenter; width: 100; height: 24; radius: 6
+                                color: "#30a6e3a1"; border.color: "#a6e3a1"; border.width: 1
+                                Text { anchors.centerIn: parent; text: "Wi-Fi を有効化"; font.pixelSize: 9; font.family: "Noto Sans CJK JP"; color: "#a6e3a1" }
+                                MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.toggleWifi(true) }
+                            }
+                        }
+                    }
+
+                    // WiFi List helper texts
                     Text {
-                        visible: root.wifiNetworks.length === 0 && !root.wifiScanning
+                        visible: root.wifiEnabled && root.wifiNetworks.length === 0 && !root.wifiScanning
                         text: "「スキャン」を押してWiFiを検索"
                         font.pixelSize: 10; font.family: "Noto Sans CJK JP"; color: "#585b70"
                         Layout.alignment: Qt.AlignHCenter
                     }
                     Text {
-                        visible: root.wifiScanning
+                        visible: root.wifiEnabled && root.wifiScanning
                         text: "スキャン中..."
                         font.pixelSize: 10; font.family: "Noto Sans CJK JP"; color: "#89b4fa"
                         Layout.alignment: Qt.AlignHCenter
                     }
 
+                    // Unique AP List (deduplicated)
                     Flickable {
+                        visible: root.wifiEnabled
                         Layout.fillWidth: true; Layout.fillHeight: true
                         clip: true
                         contentHeight: wifiCol.implicitHeight
@@ -362,7 +408,6 @@ Item {
 
                                     RowLayout {
                                         anchors.fill: parent; anchors.margins: 8; spacing: 6
-                                        // Signal strength icon
                                         Text {
                                             text: modelData.signal >= 80 ? "󰤨" : modelData.signal >= 60 ? "󰤥" : modelData.signal >= 40 ? "󰤢" : "󰤟"
                                             font.pixelSize: 12; color: modelData.active ? "#a6e3a1" : "#89b4fa"
@@ -371,7 +416,6 @@ Item {
                                             Text { text: modelData.ssid; font.pixelSize: 10; font.bold: true; color: "#cdd6f4" }
                                             Text { text: (modelData.security !== "" ? "󰌾 " + modelData.security : "󰌿 Open") + " • " + modelData.signal + "%"; font.pixelSize: 8; color: "#7f849c" }
                                         }
-                                        // Connect button (if not active)
                                         Rectangle {
                                             visible: !modelData.active
                                             width: 46; height: 20; radius: 5
@@ -381,7 +425,6 @@ Item {
                                             MouseArea { id: conMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                                                 onClicked: root.connectWifi(modelData.ssid) }
                                         }
-                                        // Connected indicator
                                         Text {
                                             visible: modelData.active
                                             text: "󰄬"; font.pixelSize: 12; color: "#a6e3a1"

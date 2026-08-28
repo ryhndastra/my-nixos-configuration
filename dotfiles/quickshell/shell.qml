@@ -57,6 +57,7 @@ ShellRoot {
     // ── WiFi Scan ─────────────────────────────────────────────
     property var    wifiNetworks:   []
     property bool   wifiScanning:   false
+    property bool   wifiEnabled:    true
 
     // ─────────────────────────────────────────────────────────
     // SYSTEM POLLING — all Process objects live here
@@ -205,7 +206,7 @@ ShellRoot {
     Timer { interval: 5000; running: true; repeat: true; triggeredOnStart: true
         onTriggered: if (!brightProc.running) brightProc.running = true }
 
-    // 7. Network speed (every 2s)
+    // 7. Network speed + WiFi radio status (every 2s)
     Process {
         id: netProc
         command: ["sh", "-c",
@@ -214,7 +215,8 @@ ShellRoot {
             "tx=$(cat /proc/net/dev 2>/dev/null | awk -v iface=\"$iface:\" '$1==iface{print $10}');" +
             "type=$(nmcli -t -f TYPE,STATE device 2>/dev/null | grep connected | head -1 | cut -d: -f1 || echo ethernet);" +
             "ssid=$(nmcli -t -f ACTIVE,SSID dev wifi 2>/dev/null | grep '^yes' | cut -d: -f2 || echo '');" +
-            "echo \"$iface|$rx|$tx|$type|$ssid\""]
+            "rad=$(nmcli radio wifi 2>/dev/null || echo enabled);" +
+            "echo \"$iface|$rx|$tx|$type|$ssid|$rad\""]
         stdout: SplitParser {
             onRead: function(line) {
                 var p = line.trim().split("|")
@@ -235,23 +237,45 @@ ShellRoot {
                 var t = (p[3] || "").trim()
                 root.netType = t.includes("wifi") ? "wifi" : t.includes("ethernet") ? "ethernet" : "none"
                 root.netSSID = (p[4] || "").trim()
+                root.wifiEnabled = (p[5] || "enabled").trim() === "enabled"
             }
         }
     }
     Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true
         onTriggered: if (!netProc.running) netProc.running = true }
 
-    // 8. WiFi scan (on demand)
+    // 8. WiFi scan (on demand, deduplicated by SSID)
     Process {
         id: wifiScanProc
-        command: ["sh", "-c", "nmcli -t -f SSID,SIGNAL,SECURITY,IN-USE dev wifi list 2>/dev/null | head -20"]
+        command: ["sh", "-c", "nmcli -t -f SSID,SIGNAL,SECURITY,IN-USE dev wifi list --rescan yes 2>/dev/null | awk -F: '$1!=\"\"{if(!seen[$1] || $2>sig[$1]){seen[$1]=1; sig[$1]=$2; line[$1]=$0}} END{for(i in line) print line[i]}'"]
         stdout: SplitParser {
             onRead: function(line) {
                 var p = line.trim().split(":")
                 if (p.length >= 3 && p[0] !== "") {
-                    var nets = root.wifiNetworks.slice()
-                    nets.push({ ssid: p[0], signal: parseInt(p[1]) || 0, security: p[2] || "", active: p[3] === "*" })
-                    root.wifiNetworks = nets
+                    var ssid = p[0]
+                    var signal = parseInt(p[1]) || 0
+                    var sec = p[2] || ""
+                    var active = p[3] === "*"
+                    var list = root.wifiNetworks.slice()
+                    var found = false
+                    for (var i = 0; i < list.length; i++) {
+                        if (list[i].ssid === ssid) {
+                            if (signal > list[i].signal || active) {
+                                list[i] = { ssid: ssid, signal: signal, security: sec, active: active }
+                            }
+                            found = true
+                            break
+                        }
+                    }
+                    if (!found) {
+                        list.push({ ssid: ssid, signal: signal, security: sec, active: active })
+                    }
+                    list.sort(function(a, b) {
+                        if (a.active) return -1
+                        if (b.active) return 1
+                        return b.signal - a.signal
+                    })
+                    root.wifiNetworks = list
                 }
             }
         }
@@ -263,6 +287,13 @@ ShellRoot {
         root.wifiNetworks = []
         root.wifiScanning = true
         if (!wifiScanProc.running) wifiScanProc.running = true
+    }
+    function toggleWifi(enable) {
+        root.wifiEnabled = enable
+        Quickshell.execDetached(["nmcli", "radio", "wifi", enable ? "on" : "off"])
+        if (enable) {
+            scanWifi()
+        }
     }
 
     // ─────────────────────────────────────────────────────────
@@ -384,16 +415,14 @@ ShellRoot {
                     }
                 }
 
-                // Noctalia Master Control Center Pill
+                // Noctalia Master Control Center Button
                 ControlCenterWidget {
                     id: ccW
                     Layout.alignment: Qt.AlignVCenter
-                    volumePercent: root.volumePercent; volumeMuted: root.volumeMuted
-                    batteryPercent: root.batteryPercent; batteryCharging: root.batteryCharging
-                    netType: root.netType; isOpen: root.openDropdown === "cc"
+                    isOpen: root.openDropdown === "cc"
                     onClicked: {
                         var p = ccW.mapToItem(barCapsule, 0, 0)
-                        root.ccWidgetX = barCapsule.x + p.x + ccW.width / 2 - 180
+                        root.ccWidgetX = barCapsule.x + p.x + ccW.width / 2 - 190
                         root.openDropdown = root.openDropdown === "cc" ? "" : "cc"
                     }
                 }
@@ -533,6 +562,8 @@ ShellRoot {
             trackTitle: root.trackTitle; trackArtist: root.trackArtist; isPlaying: root.isPlaying
             wifiNetworks: root.wifiNetworks
             wifiScanning: root.wifiScanning
+            wifiEnabled: root.wifiEnabled
+            onToggleWifi: (en) => root.toggleWifi(en)
             onVolumeChange: (pct) => {
                 Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", (pct / 100).toFixed(2)])
                 if (!volProc.running) volProc.running = true

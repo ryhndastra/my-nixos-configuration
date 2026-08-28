@@ -179,18 +179,26 @@ in
       "kwin"."Window Grow Vertical" = "Meta+Ctrl+Up";
       "kwin"."Window Shrink Vertical" = "Meta+Ctrl+Down";
 
-      # Workspaces Navigation & Window Moving (Win+Number & Win+Shift+Number)
+      # Workspaces Navigation & Window Moving (Win+Number & Win+Shift+Number 1-9)
       "kwin"."Switch to Desktop 1" = "Meta+1";
       "kwin"."Switch to Desktop 2" = "Meta+2";
       "kwin"."Switch to Desktop 3" = "Meta+3";
       "kwin"."Switch to Desktop 4" = "Meta+4";
       "kwin"."Switch to Desktop 5" = "Meta+5";
+      "kwin"."Switch to Desktop 6" = "Meta+6";
+      "kwin"."Switch to Desktop 7" = "Meta+7";
+      "kwin"."Switch to Desktop 8" = "Meta+8";
+      "kwin"."Switch to Desktop 9" = "Meta+9";
 
       "kwin"."Window to Desktop 1" = "Meta+Shift+1";
       "kwin"."Window to Desktop 2" = "Meta+Shift+2";
       "kwin"."Window to Desktop 3" = "Meta+Shift+3";
       "kwin"."Window to Desktop 4" = "Meta+Shift+4";
       "kwin"."Window to Desktop 5" = "Meta+Shift+5";
+      "kwin"."Window to Desktop 6" = "Meta+Shift+6";
+      "kwin"."Window to Desktop 7" = "Meta+Shift+7";
+      "kwin"."Window to Desktop 8" = "Meta+Shift+8";
+      "kwin"."Window to Desktop 9" = "Meta+Shift+9";
 
       # Lock screen (matching Niri Meta+Alt+L)
       "ksmserver"."Lock Session" = "Meta+Alt+L";
@@ -216,13 +224,13 @@ in
       "kwinrc"."Windows"."ElectricBorderMaximize" = false;
       "kwinrc"."Windows"."CornerBarrier" = false;
 
-      # Native KWin Smooth Rounded Corners Shader (14px radius + Sakura Outline Border)
+      # Native KWin Smooth Rounded Corners Shader (14px radius + Thicker Sakura Pink Outline Border)
       "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
       "kwinrc"."Effect-shapecorners"."RoundCorners" = true;
       "kwinrc"."Effect-shapecorners"."CornerRadius" = 14;
       "kwinrc"."Effect-shapecorners"."Outline" = true;
-      "kwinrc"."Effect-shapecorners"."OutlineThickness" = 2.5;
-      "kwinrc"."Effect-shapecorners"."OutlineColor" = "203,166,247,210";
+      "kwinrc"."Effect-shapecorners"."OutlineThickness" = 3.5;
+      "kwinrc"."Effect-shapecorners"."OutlineColor" = "245,194,231,240";
       "kwinrc"."Effect-shapecorners"."Shadow" = true;
       "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
 
