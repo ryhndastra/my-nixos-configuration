@@ -161,6 +161,12 @@ in
           }
           {
             name = "org.kde.plasma.pager";
+            config = {
+              General = {
+                showWindowOutlines = false;
+                displayedText = "Number";
+              };
+            };
           }
           {
             name = "org.kde.plasma.systemtray";
@@ -208,8 +214,8 @@ in
       # Launcher & Overview
       "org.kde.plasma.kickoff"."_launch" = "Meta";
       "services/org.kde.plasma.kickoff.desktop"."_launch" = "Meta";
-      "krunner.desktop"."_launch" = "Meta+D";
-      "org.kde.krunner.desktop"."_launch" = "Meta+D";
+      "krunner.desktop"."_launch" = "Meta+Space";
+      "org.kde.krunner.desktop"."_launch" = "Meta+Space";
 
       # Window Controls
       "kwin"."Window Close" = "Meta+Q";
