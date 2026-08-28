@@ -190,15 +190,15 @@ in
       "kwin"."Switch to Desktop 8" = "Meta+8";
       "kwin"."Switch to Desktop 9" = "Meta+9";
 
-      "kwin"."Window to Desktop 1" = "Meta+Shift+1";
-      "kwin"."Window to Desktop 2" = "Meta+Shift+2";
-      "kwin"."Window to Desktop 3" = "Meta+Shift+3";
-      "kwin"."Window to Desktop 4" = "Meta+Shift+4";
-      "kwin"."Window to Desktop 5" = "Meta+Shift+5";
-      "kwin"."Window to Desktop 6" = "Meta+Shift+6";
-      "kwin"."Window to Desktop 7" = "Meta+Shift+7";
-      "kwin"."Window to Desktop 8" = "Meta+Shift+8";
-      "kwin"."Window to Desktop 9" = "Meta+Shift+9";
+      "kwin"."Window to Desktop 1" = "Meta+Shift+1\tMeta+!";
+      "kwin"."Window to Desktop 2" = "Meta+Shift+2\tMeta+@";
+      "kwin"."Window to Desktop 3" = "Meta+Shift+3\tMeta+#";
+      "kwin"."Window to Desktop 4" = "Meta+Shift+4\tMeta+$";
+      "kwin"."Window to Desktop 5" = "Meta+Shift+5\tMeta+%";
+      "kwin"."Window to Desktop 6" = "Meta+Shift+6\tMeta+^";
+      "kwin"."Window to Desktop 7" = "Meta+Shift+7\tMeta+&";
+      "kwin"."Window to Desktop 8" = "Meta+Shift+8\tMeta+*";
+      "kwin"."Window to Desktop 9" = "Meta+Shift+9\tMeta+(";
 
       # Lock screen (matching Niri Meta+Alt+L)
       "ksmserver"."Lock Session" = "Meta+Alt+L";
@@ -241,11 +241,11 @@ in
       "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeNormalWindows" = true;
       "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeDialogs" = true;
 
-      # Custom Sweet Dark Transparent Mac Traffic Light Window Decoration
-      "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";
-      "kwinrc"."org.kde.kdecoration2"."theme" = "__aurorae__svg__Sweet-Dark-transparent-Custom";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
+      # Native Breeze Decoration with macOS traffic lights (fully supported by ShapeCorners shader)
+      "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.breeze";
+      "kwinrc"."org.kde.kdecoration2"."theme" = "Breeze";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XIA";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "";
       "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
       "kwinrc"."org.kde.kdecoration2"."BorderSizeAuto" = false;
 
