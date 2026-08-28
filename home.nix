@@ -226,13 +226,21 @@ in
 
       # Native KWin Smooth Rounded Corners Shader (14px radius + Thicker Sakura Pink Outline Border)
       "kwinrc"."Plugins"."kwin4_effect_shapecornersEnabled" = true;
-      "kwinrc"."Effect-shapecorners"."RoundCorners" = true;
-      "kwinrc"."Effect-shapecorners"."CornerRadius" = 14;
-      "kwinrc"."Effect-shapecorners"."Outline" = true;
-      "kwinrc"."Effect-shapecorners"."OutlineThickness" = 3.5;
-      "kwinrc"."Effect-shapecorners"."OutlineColor" = "245,194,231,240";
-      "kwinrc"."Effect-shapecorners"."Shadow" = true;
-      "kwinrc"."Effect-shapecorners"."SecondCornerRadius" = 14;
+      "kwinrc"."Plugins"."kwin-helperEnabled" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."Size" = 14;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."InactiveCornerRadius" = 14;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineThickness" = 3.5;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."OutlineColor" = "245,194,231";
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."ActiveOutlineUseCustom" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."ActiveOutlineAlpha" = 240;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundMaximize" = false;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundTile" = false;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableRoundFullScreen" = false;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineMaximize" = false;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineTile" = false;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."DisableOutlineFullScreen" = false;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeNormalWindows" = true;
+      "kwinrc"."Effect-kwin4_effect_shapecorners"."IncludeDialogs" = true;
 
       # Custom Sweet Dark Transparent Mac Traffic Light Window Decoration
       "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";
@@ -262,8 +270,6 @@ in
       "kwinrulesrc"."1"."wmclassmatch" = 0;
       "kwinrulesrc"."1"."size" = "1040,650";
       "kwinrulesrc"."1"."sizerule" = 3; # 3 = Apply on initial spawn
-      "kwinrulesrc"."1"."position" = "center";
-      "kwinrulesrc"."1"."positionrule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."1"."maximizehoriz" = false;
       "kwinrulesrc"."1"."maximizehorizrule" = 3; # 3 = Apply on initial spawn
       "kwinrulesrc"."1"."maximizevert" = false;

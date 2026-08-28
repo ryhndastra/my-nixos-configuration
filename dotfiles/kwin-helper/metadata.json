@@ -1,14 +1,14 @@
 {
+    "KPackageStructure": "KWin/Script",
     "KPlugin": {
         "Id": "kwin-helper",
-        "Name": "KWin Window and Workspace Helper",
-        "Description": "Handles Super+Shift+Number and Super+F gapped fullscreen",
+        "Name": "KWin Helper",
+        "Description": "Window and workspace movement shortcuts",
         "Icon": "preferences-system-windows",
         "ServiceTypes": ["KWin/Script"],
         "Version": "1.0",
         "Authors": [{"Name": "sho"}]
     },
-    "X-KDE-PluginKeyword": "kwin-helper",
     "X-Plasma-API": "javascript",
     "X-Plasma-MainScript": "code/main.js"
 }
