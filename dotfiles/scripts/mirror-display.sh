@@ -7,27 +7,31 @@ INTERNAL="eDP-1"
 # --- TOGGLE: kalau wl-mirror lagi jalan, matiin dulu ---
 if pgrep -x "wl-mirror" > /dev/null; then
   pkill -x "wl-mirror"
-  noctalia msg notification-show "Mirror dihentikan. 🖥️"
+  notify-send "Mirror Display" "Mirror dihentikan. 🖥️" -a "System"
   exit 0
 fi
 
-# --- Cari output eksternal yang tersambung ---
-EXTERNAL=$(niri msg outputs --json 2>/dev/null \
+# --- Cari output eksternal yang tersambung di Hyprland ---
+EXTERNAL=$(hyprctl monitors -j 2>/dev/null \
   | python3 -c "
 import sys, json
-outputs = json.load(sys.stdin)
-for o in outputs:
-    if o.get('name') != 'eDP-1':
-        print(o.get('name'))
-        break
+try:
+    outputs = json.load(sys.stdin)
+    for o in outputs:
+        if o.get('name') != 'eDP-1':
+            print(o.get('name'))
+            break
+except:
+    pass
 " 2>/dev/null)
 
 if [ -z "$EXTERNAL" ]; then
-  noctalia msg notification-show "Mirror Display ❌ -- Tidak ada layar eksternal terdeteksi. Colok kabel HDMI/DP dulu!"
+  notify-send "Mirror Display" "❌ Tidak ada layar eksternal terdeteksi. Colok kabel HDMI/DP dulu!" -a "System"
   exit 1
 fi
 
 # --- Jalankan wl-mirror: fullscreen langsung di output eksternal ---
 wl-mirror --fullscreen-output "${EXTERNAL}" "${INTERNAL}" &
 
-noctalia msg notification-show "Mirror Display 🖥️ -- Mirroring ke: ${EXTERNAL}. Tekan Super+P lagi untuk stop."
+notify-send "Mirror Display" "🖥️ Mirroring ke: ${EXTERNAL}. Tekan Super+P lagi untuk stop." -a "System"
+
