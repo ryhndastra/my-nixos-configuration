@@ -62,26 +62,31 @@ in
   xdg.configFile."hypr" = {
     source = ./dotfiles/hypr;
     recursive = true;
+    force = true;
   };
 
   xdg.configFile."quickshell" = {
     source = ./dotfiles/quickshell;
     recursive = true;
+    force = true;
   };
 
   xdg.configFile."matugen" = {
     source = ./dotfiles/matugen;
     recursive = true;
+    force = true;
   };
 
   xdg.configFile."fuzzel" = {
     source = ./dotfiles/fuzzel;
     recursive = true;
+    force = true;
   };
 
   xdg.configFile."wlogout" = {
     source = ./dotfiles/wlogout;
     recursive = true;
+    force = true;
   };
 
   home.sessionVariables = {
