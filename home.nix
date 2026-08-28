@@ -24,7 +24,7 @@ let
       cp -r aosp-cursors "$out/share/icons/"
     '';
   };
-  sakuraWallpaper = "${./dotfiles/wallpapers/pixel_sakura.png}";
+  nadirWallpaper = "${./dotfiles/nadir/wallpapers/1329166.png}";
 in
 {
   imports = [
@@ -60,20 +60,21 @@ in
     "Xcursor.theme" = "aosp-cursors";
   };
 
-  # Pure Standard KDE Plasma 6 Configuration
+  # Declarative Nadir KDE Plasma 6 Rice
   programs.plasma = {
     enable = true;
 
     workspace = {
       clickItemTo = "select";
       lookAndFeel = "org.kde.breezedark.desktop";
+      theme = "ROUNDED-COLOR-OPAQUE-CUSTOM";
       colorScheme = "CatppuccinMochaLavender";
       cursor = {
         theme = "aosp-cursors";
         size = 16;
       };
       iconTheme = "Papirus-Dark";
-      wallpaper = sakuraWallpaper;
+      wallpaper = nadirWallpaper;
     };
 
     fonts = {
@@ -107,7 +108,7 @@ in
       appearance = {
         alwaysShowClock = true;
         showMediaControls = true;
-        wallpaper = sakuraWallpaper;
+        wallpaper = nadirWallpaper;
       };
       lockOnResume = true;
       timeout = 10;
@@ -126,24 +127,56 @@ in
       };
     };
 
-    # Standard Native KDE Plasma 6 Floating Panel
+    # Nadir Rice Panels: 1) Floating Top Bar + 2) Centered Floating Bottom Dock
     panels = [
+      # Top Bar (32px Floating Rounded Pill Bar)
       {
-        location = "bottom";
-        height = 44;
+        location = "top";
+        height = 32;
         floating = true;
         widgets = [
           {
             name = "org.kde.plasma.kickoff";
             config = {
-              General = {
-                icon = "nix-snowflake";
+              General.icon = "nix-snowflake";
+            };
+          }
+          {
+            name = "org.kde.plasma.appmenu"; # Global Menu Bar
+          }
+          {
+            name = "org.kde.plasma.panelspacer";
+          }
+          {
+            name = "org.kde.plasma.digitalclock";
+            config = {
+              Appearance = {
+                showDate = true;
+                dateFormat = "shortDate";
               };
             };
           }
           {
+            name = "org.kde.plasma.panelspacer";
+          }
+          {
             name = "org.kde.plasma.pager";
           }
+          {
+            name = "org.kde.plasma.systemtray";
+          }
+        ];
+      }
+
+      # Bottom Dock (56px Floating Centered Auto-Hide Dock)
+      {
+        location = "bottom";
+        height = 56;
+        floating = true;
+        alignment = "center";
+        hiding = "autohide";
+        lengthMode = "fit";
+        widgets = [
           {
             name = "org.kde.plasma.icontasks";
             config = {
@@ -158,17 +191,11 @@ in
               };
             };
           }
-          {
-            name = "org.kde.plasma.systemtray";
-          }
-          {
-            name = "org.kde.plasma.digitalclock";
-          }
         ];
       }
     ];
 
-    # Standard Clean Shortcuts
+    # Standard Shortcuts
     shortcuts = {
       # Applications
       "services/kitty.desktop"."_launch" = "Meta+T";
@@ -210,17 +237,33 @@ in
     };
 
     configFile = {
-      # Native Breeze Window Decoration
-      "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.breeze";
-      "kwinrc"."org.kde.kdecoration2"."theme" = "Breeze";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XIA";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "";
+      # Sweet Dark Transparent Custom Window Decoration (Nadir Rice)
+      "kwinrc"."org.kde.kdecoration2"."library" = "org.kde.kwin.aurorae";
+      "kwinrc"."org.kde.kdecoration2"."theme" = "__aurorae__svg__Sweet-Dark-transparent-Custom";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "";
+      "kwinrc"."org.kde.kdecoration2"."BorderSize" = "None";
+      "kwinrc"."org.kde.kdecoration2"."BorderSizeAuto" = false;
 
       # Standard Window Behavior
       "kwinrc"."Windows"."FocusPolicy" = "FocusFollowsMouse";
       "kwinrc"."Windows"."NextFocusPrefersMouse" = true;
       "kwinrc"."Windows"."Placement" = "Centered";
     };
+  };
+
+  # Link Nadir Custom Rice Themes (Aurorae, Plasma Desktop Theme, Wallpapers)
+  xdg.dataFile."aurorae/themes/Sweet-Dark-transparent-Custom" = {
+    source = ./dotfiles/nadir/aurorae-theme/Sweet-Dark-transparent-Custom;
+    recursive = true;
+  };
+  xdg.dataFile."plasma/desktoptheme/ROUNDED-COLOR-OPAQUE-CUSTOM" = {
+    source = ./dotfiles/nadir/plasma-theme/ROUNDED-COLOR-OPAQUE-CUSTOM;
+    recursive = true;
+  };
+  xdg.dataFile."wallpapers/Abyss" = {
+    source = ./dotfiles/nadir/wallpapers;
+    recursive = true;
   };
 
   home.sessionVariables = {
