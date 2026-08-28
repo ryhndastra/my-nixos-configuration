@@ -5,6 +5,7 @@ import qs.modules.common.widgets
 Item {
     id: root
     required property var fileModelData
+    property size sourceSize: Qt.size(0, 0)
 
     MaterialSymbol {
         anchors.centerIn: parent
