@@ -220,16 +220,16 @@ in
 
       # Window Controls
       "kwin"."Window Close" = "Meta+Q";
-      "kwin"."Window Maximize" = "Meta+F";
+      "kwin"."Window Maximize" = "Meta+Shift+M";
       "kwin"."Window Fullscreen" = "Meta+Shift+F";
       "kwin"."Walk Through Windows" = "Alt+Tab";
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
 
-      # Quick Tiling (Native KWin Tile Snapping & Quarter Tiles)
+      # Quick Tiling (Native KWin Tile Snapping & Quarter Tiles with 16px Gaps)
       "kwin"."Window Quick Tile Left" = "Meta+Left";
       "kwin"."Window Quick Tile Right" = "Meta+Right";
-      "kwin"."Window Quick Tile Top" = "Meta+Up";
+      "kwin"."Window Quick Tile Top" = "Meta+F\tMeta+Up";
       "kwin"."Window Quick Tile Bottom" = "Meta+Down";
       "kwin"."Window Quick Tile Top Left" = "Meta+Shift+Left";
       "kwin"."Window Quick Tile Top Right" = "Meta+Shift+Right";
