@@ -8,7 +8,6 @@
     networkmanagerapplet
     noto-fonts-color-emoji
     polkit_gnome
-    xwayland-satellite
     wpsoffice
     obsidian
     wl-mirror
