@@ -188,7 +188,6 @@ in
       "kwin"."Window Close" = "Meta+Q";
       "kwin"."Window Maximize" = "Meta+F";
       "kwin"."Window Fullscreen" = "Meta+Shift+F";
-      "kwin"."Window Floating" = "Meta+V";
       "kwin"."Walk Through Windows" = "Alt+Tab";
       "kwin"."Overview" = "Meta+Tab";
       "kwin"."Show Desktop" = "Meta+Shift+D";
@@ -199,18 +198,12 @@ in
       "kwin"."Window Quick Tile Top" = "Meta+Up";
       "kwin"."Window Quick Tile Bottom" = "Meta+Down";
 
-      # Workspaces Navigation & Window Moving
+      # Workspaces Navigation
       "kwin"."Switch to Desktop 1" = "Meta+1";
       "kwin"."Switch to Desktop 2" = "Meta+2";
       "kwin"."Switch to Desktop 3" = "Meta+3";
       "kwin"."Switch to Desktop 4" = "Meta+4";
       "kwin"."Switch to Desktop 5" = "Meta+5";
-
-      "kwin"."Window to Desktop 1" = "Meta+Shift+1\tMeta+!";
-      "kwin"."Window to Desktop 2" = "Meta+Shift+2\tMeta+@";
-      "kwin"."Window to Desktop 3" = "Meta+Shift+3\tMeta+#";
-      "kwin"."Window to Desktop 4" = "Meta+Shift+4\tMeta+$";
-      "kwin"."Window to Desktop 5" = "Meta+Shift+5\tMeta+%";
 
       # Lock screen
       "ksmserver"."Lock Session" = "Meta+Alt+L";
