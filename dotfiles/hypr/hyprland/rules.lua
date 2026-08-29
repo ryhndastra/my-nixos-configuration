@@ -1,10 +1,9 @@
--- ######## Window rules ########
-
 -- Disable blur for xwayland context menus
 hl.window_rule({match = {class = "^()$", title = "^()$" },                   no_blur = true })
 
--- Disable blur for every window
-hl.window_rule({match = {class = ".*" }, no_blur = true })
+-- Keep media players, image viewers, and games 100% solid/opaque
+hl.window_rule({match = {class = "^(mpv|imv|swappy|gamescope|steam_app_.*)$" }, opacity = "1.0 1.0" })
+hl.window_rule({match = {class = "^(google-chrome|chromium|brave-browser)$", title = "^(.*)(YouTube|Netflix|Twitch|Prime Video)(.*)$" }, opacity = "1.0 1.0" })
 
 -- Floating
 hl.window_rule({match = {title = "^(Open File)(.*)$" },                      center = true})
