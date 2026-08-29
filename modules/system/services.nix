@@ -54,6 +54,14 @@
       xdg-desktop-portal-hyprland
       xdg-desktop-portal-gtk
     ];
+    config = {
+      common = {
+        default = [ "hyprland" "gtk" ];
+      };
+      hyprland = {
+        default = [ "hyprland" "gtk" ];
+      };
+    };
   };
 
   # Default session for Display Manager
