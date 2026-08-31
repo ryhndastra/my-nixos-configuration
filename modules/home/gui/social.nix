@@ -4,5 +4,6 @@
   home.packages = with pkgs; [
     telegram-desktop
     vesktop
+    zoom-us
   ];
 }
