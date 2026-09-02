@@ -2,7 +2,7 @@
 hl.window_rule({match = {class = "^()$", title = "^()$" },                   no_blur = true })
 
 -- Keep media players, image viewers, and games 100% solid/opaque
-hl.window_rule({match = {class = "^(mpv|imv|swappy|gamescope|steam_app_.*)$" }, opacity = "1.0 1.0" })
+hl.window_rule({match = {class = "^(mpv|imv|swappy|gamescope|steam_app_.*|org\\.vinegarhq\\.Sober)$" }, opacity = "1.0 1.0" })
 hl.window_rule({match = {class = "^(google-chrome|chromium|brave-browser)$", title = "^(.*)(YouTube|Netflix|Twitch|Prime Video)(.*)$" }, opacity = "1.0 1.0" })
 
 -- Floating
@@ -75,6 +75,7 @@ hl.window_rule({match = {title = ".*is sharing (a window|your screen).*" }, move
 hl.window_rule({match = {title = ".*\\.exe" }, immediate = true})
 hl.window_rule({match = {title = ".*minecraft.*" }, immediate = true})
 hl.window_rule({match = {class = "^(steam_app).*" }, immediate = true})
+hl.window_rule({match = {class = "^(org\\.vinegarhq\\.Sober)$" }, immediate = true})
 
 -- No shadow for tiled windows
 hl.window_rule({match = {float = 0 }, no_shadow = true})
