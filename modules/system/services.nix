@@ -3,6 +3,10 @@
 {
   services.flatpak.enable = true;
 
+  system.activationScripts.flatpak-flathub = ''
+    ${pkgs.flatpak}/bin/flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  '';
+
   services.gvfs.enable = true;
   services.udisks2.enable = true;
   services.gnome.gnome-keyring.enable = true;
