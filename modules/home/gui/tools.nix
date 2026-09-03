@@ -10,6 +10,7 @@
     polkit_gnome
     wpsoffice
     obsidian
+    postman
     wl-mirror
     wlr-randr
     wdisplays
