@@ -61,7 +61,6 @@
 
   # Development tools for Flutter & Android
   environment.systemPackages = with pkgs; [
-    android-tools
     jdk17
   ];
 
@@ -69,6 +68,5 @@
   environment.sessionVariables = {
     JAVA_HOME = "${pkgs.jdk17}";
     ANDROID_HOME = "/home/sho/Android/Sdk";
-    CHROME_EXECUTABLE = "zen-beta";
   };
 }
