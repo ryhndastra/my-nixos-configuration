@@ -8,6 +8,7 @@
       "networkmanager"
       "docker"
       "input"
+      "libvirtd"
     ];
 
     shell = pkgs.zsh;

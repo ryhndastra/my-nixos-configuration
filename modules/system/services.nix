@@ -35,6 +35,14 @@
       dates = "weekly";
     };
   };
+
+  # Virtualisation (QEMU / KVM / Virt-Manager)
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu.package = pkgs.qemu_kvm;
+  };
+  programs.virt-manager.enable = true;
+  virtualisation.spiceUSBRedirection.enable = true;
   
   programs.gamemode.enable = true;
   programs.steam = {
