@@ -59,9 +59,17 @@
     ];
   };
 
-  # Development tools for Flutter & Android
+  # Development tools
   environment.systemPackages = with pkgs; [
     jdk17
+
+    # C / C++ Development Toolchain
+    gcc
+    gdb
+    gnumake
+    cmake
+    clang-tools
+    valgrind
   ];
 
   # Environment variables for Flutter / Android toolchain
