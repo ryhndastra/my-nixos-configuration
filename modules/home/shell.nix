@@ -24,6 +24,28 @@
       # Interactive menu selection for tab completion
       zstyle ':completion:*' menu select
       bindkey '^[[Z' reverse-menu-complete
+
+      # Shortcut Compile & Run C
+      crun() {
+        if [ -z "$1" ]; then
+          echo "Usage: crun <file.c>"
+          return 1
+        fi
+        local src="$1"
+        local bin="''${src%.*}"
+        gcc -Wall -Wextra "$src" -o "$bin" && ./"$bin"
+      }
+
+      # Shortcut Compile & Run C++
+      cpprun() {
+        if [ -z "$1" ]; then
+          echo "Usage: cpprun <file.cpp>"
+          return 1
+        fi
+        local src="$1"
+        local bin="''${src%.*}"
+        g++ -Wall -Wextra "$src" -o "$bin" && ./"$bin"
+      }
     '';
   };
 
